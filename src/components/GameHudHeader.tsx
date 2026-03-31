@@ -38,13 +38,6 @@ export default function GameHudHeader() {
       {/* Bottom Gradient Line */}
       <div className="absolute bottom-0 left-5 right-5 h-0.5 hud-divider" />
 
-      {/* XP Bar */}
-      <div className="absolute bottom-2 left-5 right-5 md:left-20 md:right-20">
-        <div className="xp-bar-track">
-          <div className="xp-bar-fill animate-xp-fill" />
-        </div>
-      </div>
-
       {/* Floating Particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {[

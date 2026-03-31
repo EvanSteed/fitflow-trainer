@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { MapPin, Clock, Mail, Instagram, MessageCircle, TrendingUp, Dumbbell, Apple, ClipboardCheck, Shield, ChevronRight, Star, Zap, Trophy, Crosshair } from 'lucide-react'
+import { MapPin, Clock, Mail, Instagram, MessageCircle, TrendingUp, Dumbbell, Apple, ClipboardCheck, Shield, ChevronRight, Star, Zap, Trophy, ArrowUp } from 'lucide-react'
 import GameHudHeader from '../components/GameHudHeader'
 import GameHudFooter from '../components/GameHudFooter'
 
@@ -94,28 +94,28 @@ export default function LandingPage() {
                 icon: <Dumbbell className="w-7 h-7 text-gold" />,
                 title: 'Workout Programming',
                 desc: 'Structured workouts with progressive overload, designed around your goals and schedule. Every session adds XP to your strength stat.',
-                xp: '+250 XP',
+                xp: '+Strength',
                 stat: 'STR',
               },
               {
                 icon: <Apple className="w-7 h-7 text-gold" />,
                 title: 'Nutritional Advice',
                 desc: 'Fuel your body right. Macros, meal prep, and eating better consistently. Your nutrition stat keeps stacking higher.',
-                xp: '+200 XP',
+                xp: '+Energy',
                 stat: 'NUTR',
               },
               {
                 icon: <Shield className="w-7 h-7 text-gold" />,
                 title: 'Accountability',
                 desc: 'No more spinning your wheels. Progress checks keep you honest and on track. Clarity beats motivation every time.',
-                xp: '+175 XP',
+                xp: '+Results',
                 stat: 'FOCUS',
               },
               {
                 icon: <ClipboardCheck className="w-7 h-7 text-gold" />,
                 title: 'Habit Building',
                 desc: 'Sleep, recovery, daily routines. The boring stuff that separates Level 1 from Level 50. Progress compounds week by week.',
-                xp: '+150 XP',
+                xp: '+Life Skills',
                 stat: 'DISC',
               },
             ].map((quest, i) => (
@@ -124,8 +124,9 @@ export default function LandingPage() {
                 <div className="corner-decor-tl" />
                 <div className="corner-decor-tr" />
 
-                {/* Quest XP badge */}
-                <div className="absolute top-3 right-3 bg-hud-bg border border-teal/30 px-2 py-0.5 rounded text-[10px] text-teal font-bold">
+                {/* Quest stat boost badge */}
+                <div className="absolute top-3 right-3 bg-green-900/30 border border-green-500/40 px-2 py-0.5 rounded text-[10px] text-green-400 font-bold flex items-center gap-1">
+                  <ArrowUp className="w-3 h-3 text-green-400" />
                   {quest.xp}
                 </div>
 
@@ -141,11 +142,6 @@ export default function LandingPage() {
 
                 <h3 className="text-lg font-bold text-white mb-2 font-rajdhani">{quest.title}</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">{quest.desc}</p>
-
-                {/* Bottom XP bar */}
-                <div className="mt-4 xp-bar-track">
-                  <div className="xp-bar-fill" style={{ width: `${60 + i * 10}%` }} />
-                </div>
               </div>
             ))}
           </div>
