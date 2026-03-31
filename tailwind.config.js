@@ -131,6 +131,11 @@ module.exports = {
 					'0%, 100%': { boxShadow: '0 0 15px #ffd70044' },
 					'50%': { boxShadow: '0 0 30px #ffd70088' },
 				},
+				'xp-fill': {
+					'0%': { width: '0%' },
+					'80%': { width: '100%' },
+					'100%': { width: '0%' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -140,6 +145,7 @@ module.exports = {
 				'float-particle': 'float-particle 4s ease-in-out infinite',
 				'shimmer': 'shimmer 2s ease-in-out infinite',
 				'gold-pulse': 'gold-pulse 2s ease-in-out infinite',
+				'xp-fill': 'xp-fill 6s linear infinite',
 			},
 		},
 	},

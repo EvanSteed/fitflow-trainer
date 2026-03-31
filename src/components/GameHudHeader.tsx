@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Swords, Menu, X } from 'lucide-react'
 
@@ -17,19 +17,6 @@ export default function GameHudHeader() {
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [xpWidth, setXpWidth] = useState(35)
-  const headerRef = useRef<HTMLElement>(null)
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!headerRef.current) return
-    const rect = headerRef.current.getBoundingClientRect()
-    const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
-    setXpWidth(pct)
-  }, [])
-
-  const handleMouseLeave = useCallback(() => {
-    setXpWidth(35)
-  }, [])
 
   const handleNav = (path: string) => {
     navigate(path)
@@ -37,7 +24,7 @@ export default function GameHudHeader() {
   }
 
   return (
-    <header ref={headerRef} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className="w-full bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] relative sticky top-0 z-50">
+    <header className="w-full bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] relative sticky top-0 z-50">
       {/* Corner Decorations */}
       <div className="absolute top-0 left-0 w-[60px] h-[60px] overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full border-t-[3px] border-l-[3px] border-gold rounded-tl-lg" />
@@ -54,7 +41,7 @@ export default function GameHudHeader() {
       {/* XP Bar */}
       <div className="absolute bottom-2 left-5 right-5 md:left-20 md:right-20">
         <div className="xp-bar-track">
-          <div className="xp-bar-fill transition-[width] duration-150 ease-out" style={{ width: `${xpWidth}%` }} />
+          <div className="xp-bar-fill animate-xp-fill" />
         </div>
       </div>
 
