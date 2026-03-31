@@ -93,8 +93,8 @@ export default function LandingPage() {
               {
                 icon: <Dumbbell className="w-7 h-7 text-gold" />,
                 title: 'Workout Programming',
-                desc: 'Structured workouts with progressive overload, designed around your goals and schedule. Every session adds XP to your strength stat.',
-                xp: '+Strength',
+                desc: 'Customized training for any goal -- strength, hypertrophy, endurance, or general fitness. Progressive overload built into every session.',
+                xp: '+Fitness',
                 stat: 'STR',
               },
               {
@@ -115,7 +115,7 @@ export default function LandingPage() {
                 icon: <ClipboardCheck className="w-7 h-7 text-gold" />,
                 title: 'Habit Building',
                 desc: 'Sleep, recovery, daily routines. The boring stuff that separates Level 1 from Level 50. Progress compounds week by week.',
-                xp: '+Life Skills',
+                xp: '+Consistency',
                 stat: 'DISC',
               },
             ].map((quest, i) => (
