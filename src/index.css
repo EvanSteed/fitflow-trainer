@@ -12,7 +12,7 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -23,11 +23,9 @@
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
-
-
 
 img {
   object-position: top;
@@ -35,4 +33,283 @@ img {
 
 .fixed {
   position: fixed;
+}
+
+/* Global HUD Styles */
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background: #0a0a12;
+  color: #c8c8d8;
+}
+
+/* HUD Panel with corner decorations */
+.hud-panel {
+  position: relative;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%);
+  border: 1px solid #2a2a4e;
+}
+
+.hud-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border-top: 2px solid #ffd700;
+  border-left: 2px solid #ffd700;
+  border-top-left-radius: 4px;
+  pointer-events: none;
+}
+
+.hud-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border-top: 2px solid #ffd700;
+  border-right: 2px solid #ffd700;
+  border-top-right-radius: 4px;
+  pointer-events: none;
+}
+
+/* Gold gradient line */
+.hud-divider {
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    #ffd700 10%,
+    #00ffcc 30%,
+    #00ffcc 70%,
+    #ffd700 90%,
+    transparent 100%
+  );
+  box-shadow: 0 0 20px #00ffcc66;
+}
+
+/* Clip-path button shape */
+.hud-btn {
+  position: relative;
+  padding: 8px 18px;
+  color: #b8b8c8;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: transparent;
+  border: 1px solid transparent;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.hud-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%);
+  border: 1px solid #333;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hud-btn:hover {
+  color: #ffd700;
+  text-shadow: 0 0 10px #ffd70088;
+  border-color: #ffd70044;
+}
+
+.hud-btn:hover::before {
+  opacity: 1;
+  border-color: #ffd70066;
+  box-shadow: 0 0 15px #ffd70022;
+}
+
+/* Gold CTA Button */
+.hud-btn-gold {
+  padding: 10px 24px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #0a0a12;
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  border: 2px solid #ffd700;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  box-shadow:
+    0 0 20px #ffd70044,
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hud-btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 30px #ffd70066,
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hud-btn-gold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.4s ease;
+}
+
+.hud-btn-gold:hover::before {
+  left: 100%;
+}
+
+/* Discord Button */
+.hud-btn-discord {
+  background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%) !important;
+  color: white !important;
+  border: 1px solid #7289da !important;
+}
+
+.hud-btn-discord::before {
+  background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%) !important;
+  border-color: #7289da !important;
+}
+
+.hud-btn-discord:hover {
+  box-shadow: 0 0 20px #5865F266 !important;
+  transform: translateY(-1px);
+}
+
+/* Card with HUD styling */
+.hud-card {
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%);
+  border: 1px solid #2a2a4e;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hud-card:hover {
+  border-color: #ffd70066;
+  box-shadow: 0 0 20px #ffd70022;
+}
+
+.hud-card-featured {
+  border-color: #ffd700;
+  box-shadow: 0 0 20px #ffd70033;
+}
+
+.hud-card-featured:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 30px #ffd70055;
+}
+
+/* XP bar styling */
+.xp-bar-track {
+  height: 4px;
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ffcc, #00cc99);
+  border-radius: 1px;
+  box-shadow: 0 0 10px #00ffcc88;
+  animation: xp-glow 2s ease-in-out infinite;
+}
+
+/* Section title with HUD styling */
+.hud-section-title {
+  font-family: 'Cinzel', serif;
+  color: #ffd700;
+  text-shadow: 0 0 10px #ffd70066, 0 2px 4px #00000088;
+  letter-spacing: 1px;
+}
+
+/* Stat number styling */
+.hud-stat {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  color: #00ffcc;
+  text-shadow: 0 0 10px #00ffcc66;
+}
+
+/* Scanline overlay effect */
+.scanlines {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  z-index: 1;
+}
+
+/* Inner corner decorations for panels */
+.corner-decor {
+  position: relative;
+}
+
+.corner-decor-tl,
+.corner-decor-tr,
+.corner-decor-bl,
+.corner-decor-br {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.corner-decor-tl {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid #00ffcc;
+  border-left: 2px solid #00ffcc;
+  box-shadow: 0 0 8px #00ffcc44;
+}
+
+.corner-decor-tr {
+  top: -1px;
+  right: -1px;
+  border-top: 2px solid #00ffcc;
+  border-right: 2px solid #00ffcc;
+  box-shadow: 0 0 8px #00ffcc44;
+}
+
+.corner-decor-bl {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 2px solid #00ffcc;
+  border-left: 2px solid #00ffcc;
+  box-shadow: 0 0 8px #00ffcc44;
+}
+
+.corner-decor-br {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid #00ffcc;
+  border-right: 2px solid #00ffcc;
+  box-shadow: 0 0 8px #00ffcc44;
 }

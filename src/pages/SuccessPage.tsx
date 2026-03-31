@@ -105,7 +105,7 @@ export default function SuccessPage() {
           </p>
           <div className="space-y-2 text-sm">
             <p className="text-slate-700">
-              <span className="font-medium">Email:</span> hello@10xconsulting.com
+              <span className="font-medium">Email:</span> hello@statstackers.com
             </p>
             <p className="text-slate-700">
               <span className="font-medium">Phone:</span> +1 (555) 123-4567

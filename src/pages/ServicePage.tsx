@@ -1,5 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { Zap, Flame, Target, CheckCircle, ArrowLeft, Clock, Dumbbell, MessageCircle } from 'lucide-react'
+import GameHudHeader from '../components/GameHudHeader'
+import GameHudFooter from '../components/GameHudFooter'
 
 interface ServicePackage {
   id: string
@@ -11,8 +13,8 @@ interface ServicePackage {
   highlighted?: boolean
 }
 
-const servicesData: Record<string, { 
-  title: string 
+const servicesData: Record<string, {
+  title: string
   subtitle: string
   description: string
   icon: React.ReactNode
@@ -22,7 +24,7 @@ const servicesData: Record<string, {
     title: 'Online Coaching',
     subtitle: 'Train Anywhere, Anytime',
     description: 'Get personalized training programs delivered directly to your phone with weekly check-ins and unlimited support. Perfect for those who want expert guidance without the constraints of location or gym hours.',
-    icon: <Zap className="w-8 h-8" />,
+    icon: <Zap className="w-8 h-8 text-gold" />,
     packages: [
       {
         id: 'online-basic',
@@ -75,8 +77,8 @@ const servicesData: Record<string, {
   'train-with-me': {
     title: 'Train With Me',
     subtitle: 'In-Person Training',
-    description: 'Train directly with our experienced personal trainer in person. Get real-time feedback, motivation, and customized workouts tailored to your specific needs and goals. Experience the difference of having a trainer right by your side.',
-    icon: <Flame className="w-8 h-8" />,
+    description: 'Train directly with our experienced personal trainer in person. Get real-time feedback, motivation, and customized workouts tailored to your specific needs and goals.',
+    icon: <Flame className="w-8 h-8 text-gold" />,
     packages: [
       {
         id: 'train-single',
@@ -127,7 +129,7 @@ const servicesData: Record<string, {
     title: 'Personal Training',
     subtitle: 'Comprehensive Transformation',
     description: 'Comprehensive one-on-one training sessions designed around your unique body type, goals, and lifestyle. Includes detailed nutrition guidance and ongoing support for a complete fitness transformation.',
-    icon: <Target className="w-8 h-8" />,
+    icon: <Target className="w-8 h-8 text-gold" />,
     packages: [
       {
         id: 'pt-starter',
@@ -181,17 +183,19 @@ const servicesData: Record<string, {
 export default function ServicePage() {
   const { serviceId } = useParams()
   const navigate = useNavigate()
-  
+
   const service = serviceId ? servicesData[serviceId] : null
-  
+
   if (!service) {
     return (
-      <div className="min-h-screen bg-[#151515] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl text-white mb-4">Service Not Found</h1>
-          <button 
+      <div className="min-h-screen bg-hud-bg font-rajdhani flex items-center justify-center">
+        <div className="hud-panel p-10 text-center relative">
+          <div className="corner-decor-tl" />
+          <div className="corner-decor-tr" />
+          <h1 className="text-2xl text-white mb-4 font-rajdhani">Service Not Found</h1>
+          <button
             onClick={() => navigate('/')}
-            className="text-blue-500 hover:text-blue-400"
+            className="text-teal hover:text-gold transition-colors font-rajdhani"
           >
             Return to Home
           </button>
@@ -212,103 +216,127 @@ export default function ServicePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#151515]">
-      {/* Header */}
-      <header className="bg-[#1a1a1a]/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-[#2a2a2a]">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div 
-              onClick={() => navigate('/')}
-              className="w-10 h-10 bg-[#2533d5] rounded-xl flex items-center justify-center shadow-lg cursor-pointer"
-            >
-              <Flame className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white">10X Consulting</span>
-          </div>
-          <button
-            onClick={() => navigate('/admin')}
-            className="text-white hover:text-blue-500"
-          >
-            Trainer Login
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-hud-bg font-rajdhani">
+      <GameHudHeader />
 
       {/* Hero Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <button 
+      <section className="py-16 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5" style={{
+          backgroundImage: 'linear-gradient(#ffd700 1px, transparent 1px), linear-gradient(90deg, #ffd700 1px, transparent 1px)',
+          backgroundSize: '50px 50px'
+        }} />
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-400 mb-8"
+            className="inline-flex items-center gap-2 text-teal hover:text-gold transition-colors mb-8 font-rajdhani text-sm uppercase tracking-wider"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Services
+            Back to Base
           </button>
-          
-          <div className="w-20 h-20 bg-[#2a2a2a] rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-500">
+
+          <div className="w-20 h-20 hud-card flex items-center justify-center mx-auto mb-6">
             {service.icon}
           </div>
-          
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 font-anton uppercase tracking-wider">
+
+          <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Quest Line</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 font-cinzel tracking-wide">
             {service.title}
           </h1>
-          <p className="text-xl text-blue-500 mb-6">{service.subtitle}</p>
-          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gold mb-6 font-rajdhani" style={{ textShadow: '0 0 10px #ffd70044' }}>{service.subtitle}</p>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
             {service.description}
           </p>
         </div>
       </section>
 
       {/* Packages */}
-      <section className="py-16 px-4 bg-[#1a1a1a]">
+      <section className="py-16 px-4 bg-hud-panel/50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-4">
-            Choose Your Plan
-          </h2>
-          <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">
-            Select the option that fits your goals and lifestyle. All plans include a free consultation.
-          </p>
+          <div className="text-center mb-12">
+            <p className="text-xs text-gold uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Mission Select</p>
+            <h2 className="hud-section-title text-3xl md:text-4xl font-bold mb-4">
+              Choose Your Plan
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Select the option that fits your goals and lifestyle. All plans include a free consultation.
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {service.packages.map((pkg) => (
+            {service.packages.map((pkg, idx) => (
               <div
                 key={pkg.id}
-                className={`bg-[#1f1f1f] rounded-2xl shadow-lg transition-all border-2 overflow-hidden flex flex-col ${
-                  pkg.highlighted 
-                    ? 'border-[#2533d5] hover:border-[#1e28b8] transform md:-translate-y-2' 
-                    : 'border-[#2a2a2a] hover:border-[#2533d5]'
+                className={`hud-card relative flex flex-col ${
+                  pkg.highlighted
+                    ? 'hud-card-featured !border-gold'
+                    : ''
                 }`}
               >
                 {pkg.highlighted && (
-                  <div className="bg-[#2533d5] text-white text-xs font-bold px-3 py-2 text-center">
+                  <>
+                    <div className="corner-decor-tl" />
+                    <div className="corner-decor-tr" />
+                    <div className="corner-decor-bl" />
+                    <div className="corner-decor-br" />
+                  </>
+                )}
+
+                {pkg.highlighted && (
+                  <div className="bg-gold text-hud-bg text-xs font-bold px-3 py-2 text-center uppercase tracking-wider font-rajdhani">
                     MOST POPULAR
                   </div>
                 )}
                 <div className="p-8 flex flex-col flex-grow">
-                  <h3 className="text-2xl font-bold text-white mb-2">{pkg.name}</h3>
+                  {/* Tier indicator */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">TIER {idx + 1}</span>
+                    <div className="flex-1 h-px bg-hud-border" />
+                  </div>
+
+                  <h3 className="text-2xl font-bold text-white mb-2 font-rajdhani">{pkg.name}</h3>
                   <p className="text-gray-400 text-sm mb-6">{pkg.description}</p>
-                  
+
                   <div className="mb-6">
-                    <span className="text-4xl font-bold text-white">${pkg.price}</span>
+                    <span className="text-4xl font-bold text-white font-rajdhani">${pkg.price}</span>
                     {pkg.period && <span className="text-gray-400">{pkg.period}</span>}
                   </div>
-                  
+
                   <ul className="space-y-3 mb-8 flex-grow">
-                    {pkg.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-3 text-sm text-gray-300">
-                        <CheckCircle className="w-5 h-5 text-[#2533d5] flex-shrink-0 mt-0.5" />
+                    {pkg.features.map((feature, featureIdx) => (
+                      <li key={featureIdx} className="flex items-start gap-3 text-sm text-gray-300">
+                        <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
+                          pkg.highlighted ? 'text-gold' : 'text-teal'
+                        }`} />
                         {feature}
                       </li>
                     ))}
                   </ul>
-                  
+
+                  {/* XP bar */}
+                  <div className="mb-5">
+                    <div className="flex justify-between text-[9px] text-gray-500 uppercase tracking-wider mb-1">
+                      <span>Value Rating</span>
+                      <span>{idx === 0 ? '40%' : idx === 1 ? '75%' : '100%'}</span>
+                    </div>
+                    <div className="xp-bar-track">
+                      <div className="xp-bar-fill" style={{ width: idx === 0 ? '40%' : idx === 1 ? '75%' : '100%' }} />
+                    </div>
+                  </div>
+
                   <button
                     onClick={() => handleGetStarted(pkg)}
-                    className={`w-full py-4 rounded-xl font-semibold transition-all ${
+                    className={`w-full py-4 font-semibold transition-all font-rajdhani uppercase tracking-wider text-sm ${
                       pkg.highlighted
-                        ? 'bg-[#2533d5] text-white hover:bg-[#1e28b8]'
-                        : 'bg-[#2a2a2a] text-white hover:bg-[#2533d5] border border-[#2a2a2a] hover:border-[#2533d5]'
+                        ? 'hud-btn-gold'
+                        : 'hud-btn !w-full !py-4'
                     }`}
+                    style={!pkg.highlighted ? {
+                      clipPath: 'none',
+                      border: '1px solid #333',
+                      background: 'linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%)',
+                      color: '#c8c8d8',
+                    } : {}}
                   >
                     Get Started
                   </button>
@@ -322,54 +350,33 @@ export default function ServicePage() {
       {/* Features */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-white mb-12">
-            What's Included
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Dumbbell className="w-6 h-6 text-blue-500" />
+          <div className="text-center mb-12">
+            <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Loot Table</p>
+            <h2 className="hud-section-title text-3xl font-bold">What's Included</h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            {[
+              { icon: <Dumbbell className="w-6 h-6 text-gold" />, title: 'Custom Workouts', desc: 'Programs designed specifically for your body type and goals' },
+              { icon: <Clock className="w-6 h-6 text-gold" />, title: 'Flexible Scheduling', desc: 'Book sessions at times that work for your lifestyle' },
+              { icon: <MessageCircle className="w-6 h-6 text-gold" />, title: 'Ongoing Support', desc: 'Direct access to your trainer for questions and motivation' },
+              { icon: <Target className="w-6 h-6 text-gold" />, title: 'Progress Tracking', desc: 'Regular assessments to ensure you\'re on track' },
+            ].map((item, i) => (
+              <div key={i} className="hud-card flex items-start gap-4 p-5">
+                <div className="w-12 h-12 bg-hud-bg border border-gold/30 rounded flex items-center justify-center flex-shrink-0">
+                  {item.icon}
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold mb-1 font-rajdhani">{item.title}</h3>
+                  <p className="text-gray-400 text-sm">{item.desc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-white font-semibold mb-1">Custom Workouts</h3>
-                <p className="text-gray-400 text-sm">Programs designed specifically for your body type and goals</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Clock className="w-6 h-6 text-blue-500" />
-              </div>
-              <div>
-                <h3 className="text-white font-semibold mb-1">Flexible Scheduling</h3>
-                <p className="text-gray-400 text-sm">Book sessions at times that work for your lifestyle</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <MessageCircle className="w-6 h-6 text-blue-500" />
-              </div>
-              <div>
-                <h3 className="text-white font-semibold mb-1">Ongoing Support</h3>
-                <p className="text-gray-400 text-sm">Direct access to your trainer for questions and motivation</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Target className="w-6 h-6 text-blue-500" />
-              </div>
-              <div>
-                <h3 className="text-white font-semibold mb-1">Progress Tracking</h3>
-                <p className="text-gray-400 text-sm">Regular assessments to ensure you're on track</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 bg-black text-green-500 text-center">
-        <p>&copy; 2026 10X Consulting.</p>
-      </footer>
+      <GameHudFooter />
     </div>
   )
 }

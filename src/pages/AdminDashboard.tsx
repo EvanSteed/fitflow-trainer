@@ -88,7 +88,7 @@ export default function AdminDashboard() {
               <Dumbbell className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">10X Consulting Dashboard</h1>
+              <h1 className="text-xl font-bold text-slate-900">Stat Stackers Dashboard</h1>
               <p className="text-xs text-slate-500">Trainer Admin Panel</p>
             </div>
           </div>
