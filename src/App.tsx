@@ -7,6 +7,7 @@ import PaymentPage from './pages/PaymentPage'
 import SuccessPage from './pages/SuccessPage'
 import ServicePage from './pages/ServicePage'
 import TrainersPage from './pages/TrainersPage'
+import WhatWeDoPage from './pages/WhatWeDoPage'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/trainers" element={<TrainersPage />} />
+        <Route path="/what-we-do" element={<WhatWeDoPage />} />
         <Route path="/intake" element={<IntakeWizard />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/success" element={<SuccessPage />} />

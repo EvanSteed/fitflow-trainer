@@ -28,6 +28,7 @@ export default function GameHudFooter() {
             <ul className="space-y-2">
               {[
                 { label: 'Home', path: '/' },
+                { label: 'What We Do', path: '/what-we-do' },
                 { label: 'Pricing', path: '/pricing' },
                 { label: 'Trainer Login', path: '/admin' },
               ].map((link) => (
