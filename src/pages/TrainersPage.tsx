@@ -238,11 +238,37 @@ export default function TrainersPage() {
 
                 <div className="px-6 pb-4">
                   <div className="flex justify-between text-[9px] text-gray-500 uppercase tracking-wider mb-1">
-                    <span>Reputation</span>
-                    <span>Lv.{trainer.level}</span>
+                    <span>Power Level</span>
                   </div>
-                  <div className="xp-bar-track">
-                    <div className="xp-bar-fill" style={{ width: '85%' }} />
+                  <div className="relative h-5 bg-black/60 border border-gray-700 rounded-sm overflow-hidden" style={{ boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)' }}>
+                    {/* Segments */}
+                    <div className="absolute inset-0 flex pointer-events-none">
+                      {Array.from({ length: 10 }).map((_, i) => (
+                        <div key={i} className="flex-1 border-r border-black/40 last:border-r-0" />
+                      ))}
+                    </div>
+                    {/* Health fill */}
+                    <div
+                      className="h-full relative"
+                      style={{
+                        width: `${trainer.reputation || 85}%`,
+                        background: (trainer.reputation || 85) > 60
+                          ? 'linear-gradient(180deg, #4ade80 0%, #22c55e 40%, #16a34a 100%)'
+                          : (trainer.reputation || 85) > 30
+                          ? 'linear-gradient(180deg, #facc15 0%, #eab308 40%, #ca8a04 100%)'
+                          : 'linear-gradient(180deg, #f87171 0%, #ef4444 40%, #dc2626 100%)',
+                        boxShadow: (trainer.reputation || 85) > 60
+                          ? '0 0 8px #22c55e66'
+                          : (trainer.reputation || 85) > 30
+                          ? '0 0 8px #eab30866'
+                          : '0 0 8px #ef444466',
+                        transition: 'width 0.5s ease-out',
+                      }}
+                    />
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 pointer-events-none" style={{
+                      background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%)',
+                    }} />
                   </div>
                 </div>
               </div>
