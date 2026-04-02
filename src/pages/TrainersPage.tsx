@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Shield, Sword, Heart, Brain, Star, CaretRight, User } from '@phosphor-icons/react'
+import { Shield, Sword, Heart, Brain, Star, CaretRight, User, Skull } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -12,8 +12,10 @@ gsap.registerPlugin(ScrollTrigger, useGSAP)
 const trainers = [
   {
     name: 'Evan',
-    title: 'Guild Master',
-    class: 'Fitness Strategist',
+    title: 'Demon Lord',
+    titleColor: '#a78bfa',
+    titleGlow: '0 0 10px #a78bfa66',
+    class: 'Berserker',
     level: 50,
     role: 'Lead Trainer',
     avatar: null,
@@ -24,68 +26,86 @@ const trainers = [
       wis: 85,
       cha: 78,
     },
-    traits: ['Program Design', 'Nutrition Strategy', 'Habit Engineering'],
-    bio: 'Founder of Stat Stackers. Dedicated to helping you level up every aspect of your fitness journey.',
+    traits: ['Fitness Cert III & IV', 'BCom Marketing Management Innovation'],
+    bio: 'Guild leader of Stat Stackers. His aura will make you go beyond your limits.',
     active: true,
+    reputation: 85,
+  },
+  {
+    name: 'Leon',
+    title: 'The Wise One',
+    titleColor: '#a78bfa',
+    titleGlow: '0 0 10px #a78bfa66',
+    class: 'High Priest',
+    level: 45,
+    role: 'Chief Advisor',
+    avatar: null,
+    stats: {
+      str: 75,
+      con: 80,
+      int: 98,
+      wis: 96,
+      cha: 88,
+    },
+    traits: ['Fitness Cert III & IV', 'Former IFBB Physique Competitor'],
+    bio: 'Decades of experience raiding the deadliest dungeons in the materium. Ready to regenerate even the most battle scarred warriors.',
+    active: true,
+    reputation: 100,
   },
 ]
 
 export default function TrainersPage() {
   const navigate = useNavigate()
   const containerRef = useRef(null)
-  const cardRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    if (!cardRef.current) return
-    const card = cardRef.current
+    const cards = gsap.utils.toArray<HTMLElement>('.trainer-card')
 
-    const handleMove = (e: MouseEvent) => {
-      const rect = card.getBoundingClientRect()
-      const x = (e.clientX - rect.left) / rect.width - 0.5
-      const y = (e.clientY - rect.top) / rect.height - 0.5
-      gsap.to(card, {
-        rotationY: x * 12,
-        rotationX: -y * 8,
-        duration: 0.4,
-        ease: 'power2.out',
-        transformPerspective: 800,
-      })
-    }
-
-    const handleLeave = () => {
-      gsap.to(card, {
-        rotationY: 0,
-        rotationX: 0,
-        duration: 0.6,
-        ease: 'elastic.out(1, 0.5)',
-      })
-    }
-
-    card.addEventListener('mousemove', handleMove)
-    card.addEventListener('mouseleave', handleLeave)
-
-    return () => {
-      card.removeEventListener('mousemove', handleMove)
-      card.removeEventListener('mouseleave', handleLeave)
-    }
-  }, { scope: containerRef })
-
-  useGSAP(() => {
-    if (!cardRef.current) return
-    gsap.fromTo(cardRef.current,
-      { opacity: 0, y: 60 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: cardRef.current,
-          start: 'top 80%',
-          once: true,
-        },
+    cards.forEach((card) => {
+      const handleMove = (e: MouseEvent) => {
+        const rect = card.getBoundingClientRect()
+        const x = (e.clientX - rect.left) / rect.width - 0.5
+        const y = (e.clientY - rect.top) / rect.height - 0.5
+        gsap.to(card, {
+          rotationY: x * 12,
+          rotationX: -y * 8,
+          duration: 0.4,
+          ease: 'power2.out',
+          transformPerspective: 800,
+        })
       }
-    )
+
+      const handleLeave = () => {
+        gsap.to(card, {
+          rotationY: 0,
+          rotationX: 0,
+          duration: 0.6,
+          ease: 'elastic.out(1, 0.5)',
+        })
+      }
+
+      card.addEventListener('mousemove', handleMove)
+      card.addEventListener('mouseleave', handleLeave)
+    })
+
+    // Scroll reveal for cards
+    gsap.utils.toArray<HTMLElement>('.trainer-card').forEach((card, i) => {
+      gsap.fromTo(card,
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: i * 0.15,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 80%',
+            once: true,
+          },
+        }
+      )
+    })
   }, { scope: containerRef })
 
   return (
@@ -113,7 +133,7 @@ export default function TrainersPage() {
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-1 gap-8 stagger-enter">
             {trainers.map((trainer) => (
-              <div key={trainer.name} ref={cardRef} className="hud-card relative overflow-hidden" style={{ opacity: 0 }}>
+              <div key={trainer.name} className="trainer-card hud-card relative overflow-hidden" style={{ opacity: 0 }}>
                 <div className="corner-decor-tl" />
                 <div className="corner-decor-tr" />
                 <div className="corner-decor-bl" />
@@ -139,8 +159,9 @@ export default function TrainersPage() {
                           <span className="text-[9px] uppercase tracking-widest">Portrait TBD</span>
                         </div>
 
-                        <div className="absolute top-2 right-2 bg-gradient-to-br from-[#ff4444] to-[#cc0000] text-white text-[10px] font-bold px-2 py-1 rounded border border-[#ff6666] shadow-[0_0_8px_#ff444488]">
-                          LV {trainer.level}
+                        <div className="absolute top-2 right-2 bg-gradient-to-br from-[#ff4444] to-[#cc0000] text-[10px] font-bold px-2 py-1 rounded border border-[#ff6666] shadow-[0_0_12px_#ff444488] flex items-center gap-1">
+                          <span className="text-white">Lv.</span>
+                          <Skull className="w-4 h-4 text-white" weight="fill" style={{ filter: 'drop-shadow(0 0 4px #ff4444)' }} />
                         </div>
                       </div>
 
@@ -154,7 +175,7 @@ export default function TrainersPage() {
                       <h2 className="font-cinzel text-2xl font-bold text-gold" style={{ textShadow: '0 0 10px #ffd70066' }}>
                         {trainer.name}
                       </h2>
-                      <p className="text-xs text-teal uppercase tracking-[3px] font-semibold mt-0.5">{trainer.title}</p>
+                      <p className="text-xs uppercase tracking-[3px] font-semibold mt-0.5" style={{ color: trainer.titleColor, textShadow: trainer.titleGlow }}>{trainer.title}</p>
                     </div>
                   </div>
 

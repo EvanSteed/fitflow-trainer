@@ -42,7 +42,7 @@ const servicesData: Record<string, {
           'Weekly personalized workout programs',
           'Monthly progress check-in',
           'Exercise video library access',
-          'Training app access'
+          'Discord server access'
         ]
       },
       {
@@ -57,7 +57,7 @@ const servicesData: Record<string, {
           'Nutrition guidance & meal templates',
           'WhatsApp support during business hours',
           'Monthly progress report',
-          'Training app access'
+          'Discord server access'
         ],
         highlighted: true
       },
@@ -75,7 +75,7 @@ const servicesData: Record<string, {
           'Weekly progress calls',
           'Custom exercise library',
           'Priority scheduling',
-          'Training app access'
+          'Discord server access'
         ]
       }
     ]

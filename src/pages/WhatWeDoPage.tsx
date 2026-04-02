@@ -94,7 +94,7 @@ export default function WhatWeDoPage() {
         'Progressive overload built into every session so you keep leveling up',
         'Programs for strength, hypertrophy, endurance, or general fitness',
         'Exercise substitutions for home gym or limited equipment',
-        'Access to a training app to track every set, rep, and PR',
+        'Programs delivered directly through Discord for easy access',
       ],
       xp: '+STR',
     },
@@ -135,7 +135,7 @@ export default function WhatWeDoPage() {
       subtitle: 'Perfect Your Technique',
       description: 'Bad form is a debuff you don\'t want. It limits your gains and puts you at risk for injury. Send us videos of your lifts, and we\'ll break down your technique with detailed feedback.',
       details: [
-        'Submit video form checks anytime through the app',
+        'Submit video form checks anytime through Discord',
         'Detailed written and annotated feedback on your lifts',
         'Cues and corrections to improve bar path, bracing, and positioning',
         'Unlimited form checks on higher-tier plans',
@@ -373,8 +373,8 @@ export default function WhatWeDoPage() {
             {[
               { step: '01', title: 'Choose Your Plan', desc: 'Pick the tier that matches your goals and budget. Every plan starts with a free consultation to assess your current level and set your objectives.' },
               { step: '02', title: 'Complete Your Intake', desc: 'Fill out a detailed questionnaire about your training history, goals, injuries, schedule, and nutrition. This is how we build your starting stats.' },
-              { step: '03', title: 'Get Your Custom Program', desc: 'Within 48 hours, you receive your personalized training program and nutrition guidelines through the app. Every detail is built around you.' },
-              { step: '04', title: 'Train & Track', desc: 'Follow your program, log your workouts, and send form check videos. Everything feeds back to your coach so the system stays optimized.' },
+              { step: '03', title: 'Get Your Custom Program', desc: 'Within 48 hours, you receive your personalized training program and nutrition guidelines through Discord. Every detail is built around you.' },
+              { step: '04', title: 'Train & Track', desc: 'Follow your program, send form check videos, and communicate with your coach -- all through Discord. Everything stays in one place so the system stays optimized.' },
               { step: '05', title: 'Check In & Level Up', desc: 'At your scheduled check-in, we review your progress, adjust your program, and set new targets. Rinse and repeat. Week by week, stat by stat.' },
             ].map((item, i) => (
               <div key={i} className="timeline-item hud-card flex items-start gap-5 p-6 relative" style={{ opacity: 0 }}>

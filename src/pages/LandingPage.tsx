@@ -180,7 +180,7 @@ function Portal() {
 
       <button
         onClick={() => navigate('/pricing')}
-        className="mt-0 hud-btn-gold font-rajdhani text-sm inline-flex items-center gap-2"
+        className="mt-4 hud-btn-gold font-rajdhani text-sm inline-flex items-center gap-2"
       >
         Step Through the Portal
         <CaretRight className="w-4 h-4" weight="bold" />

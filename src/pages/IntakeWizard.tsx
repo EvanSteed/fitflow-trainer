@@ -52,7 +52,7 @@ const equipment = [
 
 const deliveryMethods = [
   { id: 'email', label: 'Email (PDF)', icon: EnvelopeSimple, desc: 'Receive your program as a PDF attachment' },
-  { id: 'app', label: 'App Access', icon: Monitor, desc: 'Access your program through our web app' },
+  { id: 'app', label: 'Discord', icon: Monitor, desc: 'Programs and communication delivered through our Discord server' },
   { id: 'sheets', label: 'Google Sheets', icon: CalendarBlank, desc: 'Interactive spreadsheet with videos' }
 ]
 

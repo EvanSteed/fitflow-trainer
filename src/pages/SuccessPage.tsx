@@ -18,7 +18,7 @@ export default function SuccessPage() {
 
   const deliveryMethodInfo = {
     email: { icon: EnvelopeSimple, label: 'Email (PDF)', desc: 'Check your inbox for the program PDF' },
-    app: { icon: Download, label: 'App Access', desc: 'Access your program via the web app' },
+    app: { icon: Download, label: 'Discord', desc: 'Programs and communication delivered through Discord' },
     sheets: { icon: FileText, label: 'Google Sheets', desc: 'Receive a shared Google Sheets link' }
   }
 
@@ -121,7 +121,7 @@ export default function SuccessPage() {
               Back to Home
             </button>
             <button
-              onClick={() => alert('Demo mode - in production, this would download your program or show app access')}
+              onClick={() => alert('Demo mode - in production, this would open your Discord server')}
               className="hud-btn-gold font-rajdhani flex items-center justify-center gap-2 text-sm"
             >
               View My Program <ArrowRight className="w-4 h-4" weight="bold" />
