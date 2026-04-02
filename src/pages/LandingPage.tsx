@@ -1,31 +1,346 @@
+import { useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MapPin, Clock, Mail, Instagram, MessageCircle, TrendingUp, Dumbbell, Apple, ClipboardCheck, Shield, ChevronRight, Star, Zap, Trophy, ArrowUp } from 'lucide-react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import { MapPin, Clock, EnvelopeSimple, InstagramLogo, ChatCircle, TrendUp, Barbell, AppleLogo, ShieldCheck, CheckCircle, CaretRight, Star, Lightning, Trophy, ArrowUp } from '@phosphor-icons/react'
 import GameHudHeader from '../components/GameHudHeader'
 import GameHudFooter from '../components/GameHudFooter'
 
-export default function LandingPage() {
-  const navigate = useNavigate()
+gsap.registerPlugin(ScrollTrigger, useGSAP)
+
+function StatCounter({ value, label, icon }: { value: number; label: string; icon: React.ReactNode }) {
+  const ref = useRef<HTMLSpanElement>(null)
+
+  useGSAP(() => {
+    if (!ref.current) return
+    const obj = { val: 0 }
+    gsap.to(obj, {
+      val: value,
+      duration: 2,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: ref.current,
+        start: 'top 85%',
+        once: true,
+      },
+      onUpdate: () => {
+        if (ref.current) ref.current.textContent = Math.round(obj.val).toString()
+      },
+    })
+  }, { scope: ref })
 
   return (
-    <div className="min-h-screen bg-hud-bg font-rajdhani">
+    <div className="flex flex-col items-center">
+      <div className="w-12 h-12 bg-hud-panel border border-hud-border rounded flex items-center justify-center mb-1 text-teal">
+        {icon}
+      </div>
+      <span className="text-[10px] text-gray-500 uppercase tracking-widest">{label}</span>
+      <span ref={ref} className="hud-stat text-lg">0</span>
+    </div>
+  )
+}
+
+function XpBarAnimated({ width, className = '' }: { width: string; className?: string }) {
+  const barRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    if (!barRef.current) return
+    gsap.fromTo(barRef.current, { width: '0%' }, {
+      width,
+      duration: 1.5,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: barRef.current,
+        start: 'top 90%',
+        once: true,
+      },
+    })
+  }, { scope: barRef })
+
+  return (
+    <div className={`xp-bar-track ${className}`}>
+      <div ref={barRef} className="xp-bar-fill h-full" style={{ width: '0%' }} />
+    </div>
+  )
+}
+
+function Portal() {
+  const portalRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+
+  useGSAP(() => {
+    if (!portalRef.current) return
+    const glow = portalRef.current.querySelector('.portal-glow')
+    const particles = portalRef.current.querySelectorAll('.portal-particle')
+
+    // Glow pulse
+    gsap.to(glow, {
+      scale: 1.1,
+      opacity: 0.9,
+      duration: 2.5,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+    })
+
+    // Particles float upward from portal center
+    particles.forEach((p, i) => {
+      gsap.fromTo(p,
+        { y: 0, opacity: 0.9, scale: 1 },
+        {
+          y: -(60 + Math.random() * 80),
+          x: (Math.random() - 0.5) * 60,
+          opacity: 0,
+          scale: 0.2,
+          duration: 1.8 + Math.random() * 1.5,
+          ease: 'power1.out',
+          repeat: -1,
+          delay: i * 0.2,
+        }
+      )
+    })
+  }, { scope: portalRef })
+
+  const handleHover = (e: React.MouseEvent) => {
+    if (!portalRef.current) return
+    const rect = portalRef.current.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 10
+    gsap.to(portalRef.current, { rotationY: x, rotationX: -y, duration: 0.4, ease: 'power2.out' })
+  }
+
+  const handleLeave = () => {
+    gsap.to(portalRef.current, { rotationY: 0, rotationX: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' })
+  }
+
+  const handleClick = () => {
+    if (!portalRef.current) return
+    const wrapper = portalRef.current.querySelector('.portal-wrapper')
+    gsap.to(wrapper, {
+      scale: 1.08,
+      duration: 0.2,
+      ease: 'power2.in',
+      onComplete: () => {
+        gsap.to(wrapper, {
+          scale: 1,
+          duration: 0.3,
+          ease: 'power2.out',
+        })
+        navigate('/pricing')
+      },
+    })
+  }
+
+  return (
+    <div className="flex flex-col items-center mt-12">
+      <div
+        ref={portalRef}
+        onClick={handleClick}
+        onMouseMove={handleHover}
+        onMouseLeave={handleLeave}
+        className="relative cursor-pointer"
+        style={{
+          perspective: '800px',
+          width: '580px',
+          height: '580px',
+        }}
+      >
+        {/* Portal image - base layer */}
+        <div className="portal-wrapper absolute inset-0 flex items-center justify-center">
+          <img
+            src="/images/portal.png?v=4"
+            alt="Enter the portal"
+            className="w-full h-full object-contain"
+            draggable={false}
+          />
+        </div>
+
+        {/* Ambient glow overlay - centered on portal */}
+        <div className="portal-glow absolute pointer-events-none"
+          style={{
+            top: '-5%',
+            left: '10%',
+            width: '80%',
+            height: '70%',
+            background: 'radial-gradient(circle, rgba(249,115,22,0.2) 0%, rgba(59,130,246,0.12) 40%, transparent 70%)',
+            filter: 'blur(25px)',
+            zIndex: 2,
+          }}
+        />
+
+        {/* Floating particles - centered on portal */}
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className="portal-particle absolute pointer-events-none rounded-full"
+            style={{
+              zIndex: 3,
+              width: i % 3 === 0 ? '3px' : '2px',
+              height: i % 3 === 0 ? '3px' : '2px',
+              background: i % 2 === 0 ? '#60a5fa' : '#fb923c',
+              left: `${35 + Math.random() * 30}%`,
+              top: `${20 + Math.random() * 15}%`,
+              boxShadow: `0 0 6px ${i % 2 === 0 ? '#60a5fa' : '#fb923c'}`,
+            }}
+          />
+        ))}
+      </div>
+
+      <button
+        onClick={() => navigate('/pricing')}
+        className="mt-3 hud-btn-gold font-rajdhani text-sm inline-flex items-center gap-2"
+      >
+        Step Through the Portal
+        <CaretRight className="w-4 h-4" weight="bold" />
+      </button>
+      <p className="text-xs text-gray-500 mt-2 font-rajdhani">Choose your tier and begin</p>
+    </div>
+  )
+}
+
+export default function LandingPage() {
+  const navigate = useNavigate()
+  const containerRef = useRef(null)
+
+  // Scroll progress bar
+  useGSAP(() => {
+    const bar = document.getElementById('scroll-progress')
+    if (!bar) return
+    gsap.to(bar, {
+      scaleX: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: document.body,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.3,
+      },
+    })
+  }, { scope: containerRef })
+
+  // Hero grid parallax
+  useGSAP(() => {
+    const grid = document.querySelector('.hero-grid')
+    if (!grid) return
+    gsap.to(grid, {
+      y: 80,
+      scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+      },
+    })
+  }, { scope: containerRef })
+
+  // Scroll-triggered reveals
+  useGSAP(() => {
+    ScrollTrigger.batch('.reveal-card', {
+      onEnter: (elements) => {
+        gsap.fromTo(elements,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, stagger: 0.12, duration: 0.7, ease: 'power3.out', overwrite: true }
+        )
+      },
+      onLeaveBack: (elements) => {
+        gsap.to(elements, { opacity: 0, y: 40, stagger: 0.08, duration: 0.4, overwrite: true })
+      },
+      start: 'top 88%',
+      end: 'bottom 20%',
+    })
+
+    // Section labels
+    gsap.utils.toArray<HTMLElement>('.section-label').forEach((el) => {
+      gsap.fromTo(el,
+        { opacity: 0, letterSpacing: '0.3em' },
+        {
+          opacity: 1,
+          letterSpacing: '0.15em',
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+        }
+      )
+    })
+
+    // Section headings
+    gsap.utils.toArray<HTMLElement>('.section-heading').forEach((el) => {
+      gsap.fromTo(el,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+        }
+      )
+    })
+  }, { scope: containerRef })
+
+  // Pinned progression section
+  useGSAP(() => {
+    const section = document.querySelector('.progression-section')
+    if (!section) return
+    const bar = section.querySelector('.progression-bar')
+    if (bar) {
+      gsap.fromTo(bar, { width: '0%' }, {
+        width: '65%',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 60%',
+          end: 'bottom 40%',
+          scrub: 1,
+        },
+      })
+    }
+  }, { scope: containerRef })
+
+  // Magnetic buttons
+  useGSAP(() => {
+    gsap.utils.toArray<HTMLElement>('.hud-btn-gold').forEach((btn) => {
+      const handleMove = (e: MouseEvent) => {
+        const rect = btn.getBoundingClientRect()
+        const x = e.clientX - rect.left - rect.width / 2
+        const y = e.clientY - rect.top - rect.height / 2
+        gsap.to(btn, { x: x * 0.15, y: y * 0.15, duration: 0.3, ease: 'power2.out' })
+      }
+      const handleLeave = () => {
+        gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' })
+      }
+      btn.addEventListener('mousemove', handleMove)
+      btn.addEventListener('mouseleave', handleLeave)
+    })
+  }, { scope: containerRef })
+
+  return (
+    <div ref={containerRef} className="min-h-screen bg-hud-bg font-rajdhani">
+      {/* Scroll progress */}
+      <div
+        id="scroll-progress"
+        className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold via-teal to-gold origin-left z-[60]"
+        style={{ transform: 'scaleX(0)', boxShadow: '0 0 8px #ffd70066' }}
+      />
+
       <GameHudHeader />
 
       {/* Hero Section */}
-      <section className="relative py-20 md:py-28 px-4 overflow-hidden">
-        {/* Background grid pattern */}
-        <div className="absolute inset-0 opacity-5" style={{
+      <section className="hero-section relative py-20 md:py-28 px-4 overflow-hidden">
+        <div className="hero-grid absolute inset-0 opacity-5" style={{
           backgroundImage: 'linear-gradient(#ffd700 1px, transparent 1px), linear-gradient(90deg, #ffd700 1px, transparent 1px)',
           backgroundSize: '50px 50px'
         }} />
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-hud-panel border border-gold/30 px-5 py-2.5 mb-8" style={{ clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}>
-            <Star className="w-4 h-4 text-gold" />
-            <span className="text-sm text-gold font-semibold tracking-wider uppercase font-rajdhani">Track your stats. Stack your progress.</span>
+            <Star className="w-4 h-4 text-gold" weight="fill" />
+            <span className="text-sm text-gold font-semibold tracking-wide font-rajdhani">Track your stats. Stack your progress.</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight font-cinzel tracking-wide">
-            Level Up Your
+            Start Your
             <span className="block text-gold" style={{ textShadow: '0 0 20px #ffd70066, 0 0 40px #ffd70033' }}> Fitness Journey</span>
           </h1>
 
@@ -36,53 +351,25 @@ export default function LandingPage() {
 
           {/* Hero Stats Bar */}
           <div className="flex justify-center gap-8 mb-10">
-            {[
-              { label: 'STR', value: '99', icon: <Dumbbell className="w-4 h-4" /> },
-              { label: 'NUTR', value: '85', icon: <Apple className="w-4 h-4" /> },
-              { label: 'MIND', value: '72', icon: <Shield className="w-4 h-4" /> },
-            ].map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-hud-panel border border-hud-border rounded flex items-center justify-center mb-1 text-teal">
-                  {stat.icon}
-                </div>
-                <span className="text-[10px] text-gray-500 uppercase tracking-widest">{stat.label}</span>
-                <span className="hud-stat text-lg">{stat.value}</span>
-              </div>
-            ))}
+            <StatCounter value={99} label="STR" icon={<Barbell className="w-4 h-4" weight="bold" />} />
+            <StatCounter value={85} label="NUTR" icon={<AppleLogo className="w-4 h-4" weight="bold" />} />
+            <StatCounter value={72} label="MIND" icon={<ShieldCheck className="w-4 h-4" weight="bold" />} />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/pricing')}
-              className="hud-btn-gold text-base px-10 py-4"
-            >
-              View Plans
-            </button>
-            <a
-              href="https://discord.gg/BJr8TUys"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hud-btn hud-btn-discord font-rajdhani text-base px-10 py-4 inline-flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
-              </svg>
-              Join the Discord
-            </a>
-          </div>
+          {/* Portal */}
+          <Portal />
         </div>
       </section>
 
-      {/* How Stat Stacking Works - Quest Board Style */}
+      {/* How Stat Stacking Works */}
       <section className="py-16 px-4 relative">
         <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
           <div className="text-center mb-12">
-            <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// System Overview</p>
-            <h2 className="hud-section-title text-3xl md:text-4xl font-bold mb-4">
+            <p className="section-label text-xs text-teal font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>How it works</p>
+            <h2 className="section-heading hud-section-title text-3xl md:text-4xl font-bold mb-4">
               How Stat Stacking Works
             </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto text-base leading-relaxed">
               Think of your fitness like an RPG character. Every area of your life is a stat, and the more consistently you train each one, the higher your level goes.
             </p>
           </div>
@@ -91,42 +378,40 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               {
-                icon: <Dumbbell className="w-7 h-7 text-gold" />,
+                icon: <Barbell className="w-7 h-7 text-gold" weight="bold" />,
                 title: 'Workout Programming',
                 desc: 'Customized training for any goal -- strength, hypertrophy, endurance, or general fitness. Progressive overload built into every session.',
                 xp: '+Fitness',
                 stat: 'STR',
               },
               {
-                icon: <Apple className="w-7 h-7 text-gold" />,
+                icon: <AppleLogo className="w-7 h-7 text-gold" weight="bold" />,
                 title: 'Nutritional Advice',
                 desc: 'Fuel your body right. Macros, meal prep, and eating better consistently. Your nutrition stat keeps stacking higher.',
                 xp: '+Energy',
                 stat: 'NUTR',
               },
               {
-                icon: <Shield className="w-7 h-7 text-gold" />,
+                icon: <ShieldCheck className="w-7 h-7 text-gold" weight="bold" />,
                 title: 'Accountability',
                 desc: 'No more spinning your wheels. Progress checks keep you honest and on track. Clarity beats motivation every time.',
                 xp: '+Results',
                 stat: 'FOCUS',
               },
               {
-                icon: <ClipboardCheck className="w-7 h-7 text-gold" />,
+                icon: <CheckCircle className="w-7 h-7 text-gold" weight="bold" />,
                 title: 'Habit Building',
                 desc: 'Sleep, recovery, daily routines. The boring stuff that separates Level 1 from Level 50. Progress compounds week by week.',
                 xp: '+Consistency',
                 stat: 'DISC',
               },
             ].map((quest, i) => (
-              <div key={i} className="hud-card p-6 group relative">
-                {/* Corner decorations */}
+              <div key={i} className="reveal-card hud-card p-6 group relative" style={{ opacity: 0 }}>
                 <div className="corner-decor-tl" />
                 <div className="corner-decor-tr" />
 
-                {/* Quest stat boost badge */}
                 <div className="absolute top-3 right-3 bg-green-900/30 border border-green-500/40 px-2 py-0.5 rounded text-[10px] text-green-400 font-bold flex items-center gap-1">
-                  <ArrowUp className="w-3 h-3 text-green-400" />
+                  <ArrowUp className="w-3 h-3 text-green-400" weight="bold" />
                   {quest.xp}
                 </div>
 
@@ -134,43 +419,41 @@ export default function LandingPage() {
                   {quest.icon}
                 </div>
 
-                {/* Stat label */}
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">{quest.stat}</span>
                   <div className="flex-1 h-px bg-hud-border" />
                 </div>
 
                 <h3 className="text-lg font-bold text-white mb-2 font-rajdhani">{quest.title}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">{quest.desc}</p>
+                <p className="text-base text-gray-400 leading-relaxed">{quest.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Tips Section - Codex Style */}
+      {/* Tips Section */}
       <section className="py-16 px-4 bg-hud-panel/50">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xs text-gold uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Strategy Guide</p>
-            <h2 className="hud-section-title text-3xl md:text-4xl font-bold mb-4">
+            <p className="section-label text-xs text-gold font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Strategy guide</p>
+            <h2 className="section-heading hud-section-title text-3xl md:text-4xl font-bold mb-4">
               Tips to Stack Stats Faster
             </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto text-base leading-relaxed">
               Progress isn't about being perfect. It's about being consistent. Here's how to keep leveling up week after week.
             </p>
           </div>
 
           <div className="space-y-4">
             {[
-              { icon: <TrendingUp className="w-5 h-5 text-teal" />, title: 'Start small, stack daily', desc: 'Don\'t try to max every stat on Day 1. Pick one habit, lock it in for a week, then add another. Small wins compound into massive gains.', level: 'Lv.1' },
-              { icon: <ClipboardCheck className="w-5 h-5 text-teal" />, title: 'Track everything', desc: 'What gets measured gets managed. Log your workouts, meals, sleep, and mood. You can\'t level up a stat you\'re not watching.', level: 'Lv.5' },
-              { icon: <Dumbbell className="w-5 h-5 text-teal" />, title: 'Train with intention', desc: 'Every rep has a purpose. Follow a program, not a vibe. Progressive overload is the XP system. Add weight, add reps, add time under tension.', level: 'Lv.10' },
-              { icon: <Apple className="w-5 h-5 text-teal" />, title: 'Fuel like you mean it', desc: 'You can\'t out-train a bad diet. Nail your protein, stay hydrated, and eat for performance. Your nutrition stat is the multiplier for everything else.', level: 'Lv.15' },
-              { icon: <Shield className="w-5 h-5 text-teal" />, title: 'Recover to progress', desc: 'Rest days aren\'t cheat days, they\'re when your body actually builds. Sleep 7+ hours, manage stress, and treat recovery as part of the grind.', level: 'Lv.20' },
+              { icon: <TrendUp className="w-5 h-5 text-teal" weight="bold" />, title: 'Start small, stack daily', desc: 'Don\'t try to max every stat on Day 1. Pick one habit, lock it in for a week, then add another. Small wins compound into massive gains.', level: 'Lv.1' },
+              { icon: <CheckCircle className="w-5 h-5 text-teal" weight="bold" />, title: 'Track everything', desc: 'What gets measured gets managed. Log your workouts, meals, sleep, and mood. You can\'t level up a stat you\'re not watching.', level: 'Lv.5' },
+              { icon: <Barbell className="w-5 h-5 text-teal" weight="bold" />, title: 'Train with intention', desc: 'Every rep has a purpose. Follow a program, not a vibe. Progressive overload is the XP system. Add weight, add reps, add time under tension.', level: 'Lv.10' },
+              { icon: <AppleLogo className="w-5 h-5 text-teal" weight="bold" />, title: 'Fuel like you mean it', desc: 'You can\'t out-train a bad diet. Nail your protein, stay hydrated, and eat for performance. Your nutrition stat is the multiplier for everything else.', level: 'Lv.15' },
+              { icon: <ShieldCheck className="w-5 h-5 text-teal" weight="bold" />, title: 'Recover to progress', desc: 'Rest days aren\'t cheat days, they\'re when your body actually builds. Sleep 7+ hours, manage stress, and treat recovery as part of the grind.', level: 'Lv.20' },
             ].map((tip, i) => (
-              <div key={i} className="hud-card flex items-start gap-5 p-5">
-                {/* Level badge */}
+              <div key={i} className="reveal-card hud-card flex items-start gap-5 p-5" style={{ opacity: 0 }}>
                 <div className="w-10 h-10 bg-hud-bg border border-gold/30 rounded flex items-center justify-center flex-shrink-0">
                   <span className="text-gold text-[10px] font-bold">{tip.level}</span>
                 </div>
@@ -180,10 +463,9 @@ export default function LandingPage() {
                     {tip.icon}
                     <h3 className="text-base font-bold text-white font-rajdhani">{tip.title}</h3>
                   </div>
-                  <p className="text-sm text-gray-400 leading-relaxed">{tip.desc}</p>
+                  <p className="text-base text-gray-400 leading-relaxed">{tip.desc}</p>
                 </div>
 
-                {/* XP reward */}
                 <div className="flex-shrink-0 text-right">
                   <span className="text-xs text-teal font-bold">+{50 + i * 25} XP</span>
                 </div>
@@ -193,27 +475,25 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Progression CTA - Achievement Style */}
-      <section className="py-16 px-4">
+      {/* Progression CTA */}
+      <section className="progression-section py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="hud-panel p-10 md:p-14 text-center relative overflow-hidden">
-            {/* Corner decorations */}
             <div className="corner-decor-tl" />
             <div className="corner-decor-tr" />
             <div className="corner-decor-bl" />
             <div className="corner-decor-br" />
 
-            {/* Background glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
 
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 mb-6">
-                <Trophy className="w-6 h-6 text-gold" />
-                <span className="text-xs text-gold uppercase tracking-[3px] font-semibold font-rajdhani">Achievement Unlocked</span>
-                <Trophy className="w-6 h-6 text-gold" />
+                <Trophy className="w-6 h-6 text-gold" weight="fill" />
+                <span className="section-label text-xs text-gold font-semibold" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Achievement unlocked</span>
+                <Trophy className="w-6 h-6 text-gold" weight="fill" />
               </div>
 
-              <h2 className="font-cinzel text-3xl md:text-4xl font-bold text-white mb-4" style={{ textShadow: '0 0 20px #ffd70044' }}>
+              <h2 className="section-heading font-cinzel text-3xl md:text-4xl font-bold text-white mb-4" style={{ textShadow: '0 0 20px #ffd70044' }}>
                 Week by Week, Stat by Stat
               </h2>
               <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -221,7 +501,6 @@ export default function LandingPage() {
                 and you level up at your own pace. Whether you're a beginner or a veteran, there's always a next level.
               </p>
 
-              {/* Progress bar visual */}
               <div className="max-w-md mx-auto mb-8">
                 <div className="flex justify-between text-[10px] text-gray-500 uppercase tracking-wider mb-1">
                   <span>Beginner</span>
@@ -229,7 +508,7 @@ export default function LandingPage() {
                   <span>Elite</span>
                 </div>
                 <div className="xp-bar-track h-2">
-                  <div className="xp-bar-fill h-full" style={{ width: '65%' }} />
+                  <div className="progression-bar xp-bar-fill h-full" style={{ width: '0%' }} />
                 </div>
               </div>
 
@@ -238,29 +517,28 @@ export default function LandingPage() {
                 className="hud-btn-gold text-base px-10 py-4 inline-flex items-center gap-2"
               >
                 See Your Options
-                <ChevronRight className="w-5 h-5" />
+                <CaretRight className="w-5 h-5" weight="bold" />
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Community / Discord - Guild Hall Style */}
+      {/* Community */}
       <section className="py-16 px-4 bg-hud-panel/50">
         <div className="max-w-6xl mx-auto text-center">
-          <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Guild Hall</p>
-          <h2 className="hud-section-title text-3xl md:text-4xl font-bold mb-4">
+          <p className="section-label text-xs text-teal font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Guild hall</p>
+          <h2 className="section-heading hud-section-title text-3xl md:text-4xl font-bold mb-4">
             You Don't Have to Grind Alone
           </h2>
-          <p className="text-gray-400 mb-12 max-w-2xl mx-auto">
+          <p className="text-gray-400 mb-12 max-w-2xl mx-auto text-base leading-relaxed">
             Join the Stat Stackers community on Discord. Share wins, get accountability, ask questions,
             and push each other to level up. The best players never solo queue.
           </p>
 
           <div className="flex flex-col items-center gap-8">
             <div className="flex justify-center gap-8">
-              {/* Instagram */}
-              <div className="flex flex-col items-center group">
+              <div className="flex flex-col items-center group reveal-card" style={{ opacity: 0 }}>
                 <a
                   href="https://www.instagram.com/thisistogoevenfurtherbeyond/"
                   target="_blank"
@@ -268,13 +546,12 @@ export default function LandingPage() {
                   className="inline-flex items-center justify-center w-24 h-24 hud-card group-hover:border-pink-500/40 transition-all"
                   style={{ clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)' }}
                 >
-                  <Instagram className="w-10 h-10 text-pink-400" />
+                  <InstagramLogo className="w-10 h-10 text-pink-400" weight="bold" />
                 </a>
-                <p className="mt-3 text-xs text-gray-500 uppercase tracking-wider font-rajdhani">Updates</p>
+                <p className="mt-3 text-xs text-gray-500 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.1em' }}>Updates</p>
               </div>
 
-              {/* Discord */}
-              <div className="flex flex-col items-center group">
+              <div className="flex flex-col items-center group reveal-card" style={{ opacity: 0 }}>
                 <a
                   href="https://discord.gg/BJr8TUys"
                   target="_blank"
@@ -282,14 +559,13 @@ export default function LandingPage() {
                   className="inline-flex items-center justify-center w-24 h-24 hud-card group-hover:border-[#5865F2]/40 transition-all"
                   style={{ clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)' }}
                 >
-                  <MessageCircle className="w-10 h-10 text-[#5865F2]" />
+                  <ChatCircle className="w-10 h-10 text-[#5865F2]" weight="bold" />
                 </a>
-                <p className="mt-3 text-xs text-gray-500 uppercase tracking-wider font-rajdhani">Community</p>
+                <p className="mt-3 text-xs text-gray-500 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.1em' }}>Community</p>
               </div>
             </div>
 
-            {/* Discord Widget */}
-            <div className="hud-card p-1">
+            <div className="reveal-card hud-card p-1" style={{ opacity: 0 }}>
               <iframe
                 src="https://discord.com/widget?id=1353349002648621198&theme=dark"
                 width="350"
@@ -304,30 +580,30 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Contact & Location - Map Marker Style */}
+      {/* Contact */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xs text-gold uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Base Camp</p>
-            <h2 className="hud-section-title text-3xl font-bold">Ready to Start Stacking?</h2>
+            <p className="section-label text-xs text-gold font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Base camp</p>
+            <h2 className="section-heading hud-section-title text-3xl font-bold">Ready to Start Stacking?</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: <MapPin className="w-6 h-6 text-gold" />, label: 'Location', value: 'Downtown Fitness Center', sub: '123 Main Street' },
-              { icon: <Clock className="w-6 h-6 text-gold" />, label: 'Hours', value: 'Mon - Sat: 6AM - 8PM', sub: 'Sunday: By appointment' },
-              { icon: <Mail className="w-6 h-6 text-gold" />, label: 'Contact', value: 'hello@statstackers.com', sub: '+1 (555) 123-4567' },
+              { icon: <MapPin className="w-6 h-6 text-gold" weight="bold" />, label: 'Location', value: 'Downtown Fitness Center', sub: '123 Main Street' },
+              { icon: <Clock className="w-6 h-6 text-gold" weight="bold" />, label: 'Hours', value: 'Mon - Sat: 6AM - 8PM', sub: 'Sunday: By appointment' },
+              { icon: <EnvelopeSimple className="w-6 h-6 text-gold" weight="bold" />, label: 'Contact', value: 'hello@statstackers.com', sub: '+1 (555) 123-4567' },
             ].map((info, i) => (
-              <div key={i} className="hud-card p-6 text-center relative">
+              <div key={i} className="reveal-card hud-card p-6 text-center relative" style={{ opacity: 0 }}>
                 <div className="corner-decor-tl" />
                 <div className="corner-decor-tr" />
 
                 <div className="w-14 h-14 bg-hud-bg border border-gold/30 rounded flex items-center justify-center mx-auto mb-4">
                   {info.icon}
                 </div>
-                <p className="text-[10px] text-teal uppercase tracking-[3px] font-semibold mb-2 font-rajdhani">{info.label}</p>
-                <p className="text-white font-semibold text-sm">{info.value}</p>
-                <p className="text-gray-400 text-sm">{info.sub}</p>
+                <p className="text-[10px] text-teal font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.12em' }}>{info.label}</p>
+                <p className="text-white font-semibold text-base">{info.value}</p>
+                <p className="text-gray-400 text-base">{info.sub}</p>
               </div>
             ))}
           </div>

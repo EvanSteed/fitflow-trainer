@@ -1,7 +1,13 @@
+import { useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Zap, Flame, Target, CheckCircle, ArrowLeft, Clock, Dumbbell, MessageCircle } from 'lucide-react'
+import { Lightning, Fire, Target, CheckCircle, ArrowLeft, Clock, Barbell, ChatCircle } from '@phosphor-icons/react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
 import GameHudHeader from '../components/GameHudHeader'
 import GameHudFooter from '../components/GameHudFooter'
+
+gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 interface ServicePackage {
   id: string
@@ -24,7 +30,7 @@ const servicesData: Record<string, {
     title: 'Online Coaching',
     subtitle: 'Train Anywhere, Anytime',
     description: 'Get personalized training programs delivered directly to your phone with weekly check-ins and unlimited support. Perfect for those who want expert guidance without the constraints of location or gym hours.',
-    icon: <Zap className="w-8 h-8 text-gold" />,
+    icon: <Lightning className="w-8 h-8 text-gold" weight="bold" />,
     packages: [
       {
         id: 'online-basic',
@@ -78,7 +84,7 @@ const servicesData: Record<string, {
     title: 'Train With Me',
     subtitle: 'In-Person Training',
     description: 'Train directly with our experienced personal trainer in person. Get real-time feedback, motivation, and customized workouts tailored to your specific needs and goals.',
-    icon: <Flame className="w-8 h-8 text-gold" />,
+    icon: <Fire className="w-8 h-8 text-gold" weight="bold" />,
     packages: [
       {
         id: 'train-single',
@@ -129,7 +135,7 @@ const servicesData: Record<string, {
     title: 'Personal Training',
     subtitle: 'Comprehensive Transformation',
     description: 'Comprehensive one-on-one training sessions designed around your unique body type, goals, and lifestyle. Includes detailed nutrition guidance and ongoing support for a complete fitness transformation.',
-    icon: <Target className="w-8 h-8 text-gold" />,
+    icon: <Target className="w-8 h-8 text-gold" weight="bold" />,
     packages: [
       {
         id: 'pt-starter',
@@ -183,8 +189,56 @@ const servicesData: Record<string, {
 export default function ServicePage() {
   const { serviceId } = useParams()
   const navigate = useNavigate()
+  const containerRef = useRef(null)
 
   const service = serviceId ? servicesData[serviceId] : null
+
+  useGSAP(() => {
+    gsap.utils.toArray<HTMLElement>('.xp-bar-fill').forEach((bar) => {
+      const targetWidth = bar.getAttribute('data-width') || bar.style.width || '50%'
+      gsap.fromTo(bar,
+        { width: '0%' },
+        {
+          width: targetWidth,
+          duration: 1.5,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: bar,
+            start: 'top 90%',
+            once: true,
+          },
+        }
+      )
+    })
+
+    ScrollTrigger.batch('.package-card', {
+      onEnter: (elements) => {
+        gsap.fromTo(elements,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, stagger: 0.15, duration: 0.7, ease: 'power3.out', overwrite: true }
+        )
+      },
+      start: 'top 85%',
+    })
+
+    gsap.utils.toArray<HTMLElement>('.feature-item').forEach((item, i) => {
+      gsap.fromTo(item,
+        { opacity: 0, x: -20 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.5,
+          delay: i * 0.08,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 90%',
+            once: true,
+          },
+        }
+      )
+    })
+  }, { scope: containerRef })
 
   if (!service) {
     return (
@@ -216,10 +270,9 @@ export default function ServicePage() {
   }
 
   return (
-    <div className="min-h-screen bg-hud-bg font-rajdhani">
+    <div ref={containerRef} className="min-h-screen bg-hud-bg font-rajdhani">
       <GameHudHeader />
 
-      {/* Hero Section */}
       <section className="py-16 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={{
           backgroundImage: 'linear-gradient(#ffd700 1px, transparent 1px), linear-gradient(90deg, #ffd700 1px, transparent 1px)',
@@ -231,7 +284,7 @@ export default function ServicePage() {
             onClick={() => navigate('/')}
             className="inline-flex items-center gap-2 text-teal hover:text-gold transition-colors mb-8 font-rajdhani text-sm uppercase tracking-wider"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" weight="bold" />
             Back to Base
           </button>
 
@@ -239,7 +292,7 @@ export default function ServicePage() {
             {service.icon}
           </div>
 
-          <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Quest Line</p>
+          <p className="text-xs text-teal font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Quest line</p>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 font-cinzel tracking-wide">
             {service.title}
           </h1>
@@ -250,11 +303,10 @@ export default function ServicePage() {
         </div>
       </section>
 
-      {/* Packages */}
       <section className="py-16 px-4 bg-hud-panel/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xs text-gold uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Mission Select</p>
+            <p className="text-xs text-gold font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Mission select</p>
             <h2 className="hud-section-title text-3xl md:text-4xl font-bold mb-4">
               Choose Your Plan
             </h2>
@@ -263,15 +315,16 @@ export default function ServicePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 stagger-enter">
             {service.packages.map((pkg, idx) => (
               <div
                 key={pkg.id}
-                className={`hud-card relative flex flex-col ${
+                className={`package-card hud-card relative flex flex-col ${
                   pkg.highlighted
                     ? 'hud-card-featured !border-gold'
                     : ''
                 }`}
+                style={{ opacity: 0 }}
               >
                 {pkg.highlighted && (
                   <>
@@ -288,14 +341,13 @@ export default function ServicePage() {
                   </div>
                 )}
                 <div className="p-8 flex flex-col flex-grow">
-                  {/* Tier indicator */}
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">TIER {idx + 1}</span>
                     <div className="flex-1 h-px bg-hud-border" />
                   </div>
 
                   <h3 className="text-2xl font-bold text-white mb-2 font-rajdhani">{pkg.name}</h3>
-                  <p className="text-gray-400 text-sm mb-6">{pkg.description}</p>
+                  <p className="text-gray-400 text-base mb-6">{pkg.description}</p>
 
                   <div className="mb-6">
                     <span className="text-4xl font-bold text-white font-rajdhani">${pkg.price}</span>
@@ -304,23 +356,22 @@ export default function ServicePage() {
 
                   <ul className="space-y-3 mb-8 flex-grow">
                     {pkg.features.map((feature, featureIdx) => (
-                      <li key={featureIdx} className="flex items-start gap-3 text-sm text-gray-300">
+                      <li key={featureIdx} className="flex items-start gap-3 text-base text-gray-300">
                         <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
                           pkg.highlighted ? 'text-gold' : 'text-teal'
-                        }`} />
+                        }`} weight="fill" />
                         {feature}
                       </li>
                     ))}
                   </ul>
 
-                  {/* XP bar */}
                   <div className="mb-5">
                     <div className="flex justify-between text-[9px] text-gray-500 uppercase tracking-wider mb-1">
                       <span>Value Rating</span>
                       <span>{idx === 0 ? '40%' : idx === 1 ? '75%' : '100%'}</span>
                     </div>
                     <div className="xp-bar-track">
-                      <div className="xp-bar-fill" style={{ width: idx === 0 ? '40%' : idx === 1 ? '75%' : '100%' }} />
+                      <div className="xp-bar-fill" data-width={idx === 0 ? '40%' : idx === 1 ? '75%' : '100%'} style={{ width: '0%' }} />
                     </div>
                   </div>
 
@@ -347,28 +398,27 @@ export default function ServicePage() {
         </div>
       </section>
 
-      {/* Features */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Loot Table</p>
+            <p className="text-xs text-teal font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Loot table</p>
             <h2 className="hud-section-title text-3xl font-bold">What's Included</h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5">
+          <div className="grid md:grid-cols-2 gap-5 stagger-enter">
             {[
-              { icon: <Dumbbell className="w-6 h-6 text-gold" />, title: 'Custom Workouts', desc: 'Programs designed specifically for your body type and goals' },
-              { icon: <Clock className="w-6 h-6 text-gold" />, title: 'Flexible Scheduling', desc: 'Book sessions at times that work for your lifestyle' },
-              { icon: <MessageCircle className="w-6 h-6 text-gold" />, title: 'Ongoing Support', desc: 'Direct access to your trainer for questions and motivation' },
-              { icon: <Target className="w-6 h-6 text-gold" />, title: 'Progress Tracking', desc: 'Regular assessments to ensure you\'re on track' },
+              { icon: <Barbell className="w-6 h-6 text-gold" weight="bold" />, title: 'Custom Workouts', desc: 'Programs designed specifically for your body type and goals' },
+              { icon: <Clock className="w-6 h-6 text-gold" weight="bold" />, title: 'Flexible Scheduling', desc: 'Book sessions at times that work for your lifestyle' },
+              { icon: <ChatCircle className="w-6 h-6 text-gold" weight="bold" />, title: 'Ongoing Support', desc: 'Direct access to your trainer for questions and motivation' },
+              { icon: <Target className="w-6 h-6 text-gold" weight="bold" />, title: 'Progress Tracking', desc: 'Regular assessments to ensure you\'re on track' },
             ].map((item, i) => (
-              <div key={i} className="hud-card flex items-start gap-4 p-5">
+              <div key={i} className="feature-item hud-card flex items-start gap-4 p-5" style={{ opacity: 0 }}>
                 <div className="w-12 h-12 bg-hud-bg border border-gold/30 rounded flex items-center justify-center flex-shrink-0">
                   {item.icon}
                 </div>
                 <div>
                   <h3 className="text-white font-semibold mb-1 font-rajdhani">{item.title}</h3>
-                  <p className="text-gray-400 text-sm">{item.desc}</p>
+                  <p className="text-gray-400 text-base">{item.desc}</p>
                 </div>
               </div>
             ))}

@@ -1,7 +1,13 @@
+import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Shield, Sword, Heart, Brain, Star, ChevronRight, User } from 'lucide-react'
+import { Shield, Sword, Heart, Brain, Star, CaretRight, User } from '@phosphor-icons/react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
 import GameHudHeader from '../components/GameHudHeader'
 import GameHudFooter from '../components/GameHudFooter'
+
+gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 const trainers = [
   {
@@ -26,20 +32,74 @@ const trainers = [
 
 export default function TrainersPage() {
   const navigate = useNavigate()
+  const containerRef = useRef(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    if (!cardRef.current) return
+    const card = cardRef.current
+
+    const handleMove = (e: MouseEvent) => {
+      const rect = card.getBoundingClientRect()
+      const x = (e.clientX - rect.left) / rect.width - 0.5
+      const y = (e.clientY - rect.top) / rect.height - 0.5
+      gsap.to(card, {
+        rotationY: x * 12,
+        rotationX: -y * 8,
+        duration: 0.4,
+        ease: 'power2.out',
+        transformPerspective: 800,
+      })
+    }
+
+    const handleLeave = () => {
+      gsap.to(card, {
+        rotationY: 0,
+        rotationX: 0,
+        duration: 0.6,
+        ease: 'elastic.out(1, 0.5)',
+      })
+    }
+
+    card.addEventListener('mousemove', handleMove)
+    card.addEventListener('mouseleave', handleLeave)
+
+    return () => {
+      card.removeEventListener('mousemove', handleMove)
+      card.removeEventListener('mouseleave', handleLeave)
+    }
+  }, { scope: containerRef })
+
+  useGSAP(() => {
+    if (!cardRef.current) return
+    gsap.fromTo(cardRef.current,
+      { opacity: 0, y: 60 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: cardRef.current,
+          start: 'top 80%',
+          once: true,
+        },
+      }
+    )
+  }, { scope: containerRef })
 
   return (
-    <div className="min-h-screen bg-hud-bg font-rajdhani">
+    <div ref={containerRef} className="min-h-screen bg-hud-bg font-rajdhani">
       <GameHudHeader />
 
-      {/* Hero */}
       <section className="py-16 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={{
           backgroundImage: 'linear-gradient(#ffd700 1px, transparent 1px), linear-gradient(90deg, #ffd700 1px, transparent 1px)',
           backgroundSize: '50px 50px'
         }} />
 
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2 font-rajdhani">// Party Roster</p>
+        <div className="max-w-4xl mx-auto text-center relative z-10 stagger-enter">
+          <p className="text-xs text-teal font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Party roster</p>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 font-cinzel tracking-wide">
             Who <span className="text-gold" style={{ textShadow: '0 0 20px #ffd70066' }}>We Are</span>
           </h1>
@@ -49,19 +109,16 @@ export default function TrainersPage() {
         </div>
       </section>
 
-      {/* Character Cards */}
       <section className="pb-16 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-1 gap-8">
+          <div className="grid md:grid-cols-1 gap-8 stagger-enter">
             {trainers.map((trainer) => (
-              <div key={trainer.name} className="hud-card relative overflow-hidden">
-                {/* Corner decorations */}
+              <div key={trainer.name} ref={cardRef} className="hud-card relative overflow-hidden" style={{ opacity: 0 }}>
                 <div className="corner-decor-tl" />
                 <div className="corner-decor-tr" />
                 <div className="corner-decor-bl" />
                 <div className="corner-decor-br" />
 
-                {/* Top bar */}
                 <div className="bg-gold/10 border-b border-gold/20 px-6 py-2 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-teal rounded-full animate-pulse" />
@@ -73,32 +130,26 @@ export default function TrainersPage() {
                 </div>
 
                 <div className="p-6 md:p-8 flex flex-col md:flex-row gap-8">
-                  {/* Avatar Section */}
                   <div className="flex-shrink-0 flex flex-col items-center">
                     <div className="relative">
-                      {/* Character frame */}
                       <div className="w-40 h-48 bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] border-2 border-gold/40 rounded-lg overflow-hidden relative flex items-center justify-center"
                         style={{ boxShadow: '0 0 20px #ffd70022, inset 0 0 30px #00000088' }}>
-                        {/* Silhouette placeholder */}
                         <div className="flex flex-col items-center gap-2 text-gray-600">
-                          <User className="w-20 h-20" strokeWidth={1} />
+                          <User className="w-20 h-20" />
                           <span className="text-[9px] uppercase tracking-widest">Portrait TBD</span>
                         </div>
 
-                        {/* Level badge */}
                         <div className="absolute top-2 right-2 bg-gradient-to-br from-[#ff4444] to-[#cc0000] text-white text-[10px] font-bold px-2 py-1 rounded border border-[#ff6666] shadow-[0_0_8px_#ff444488]">
                           LV {trainer.level}
                         </div>
                       </div>
 
-                      {/* Frame corner accents */}
                       <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-teal" />
                       <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-teal" />
                       <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-teal" />
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-teal" />
                     </div>
 
-                    {/* Name plate */}
                     <div className="mt-3 text-center">
                       <h2 className="font-cinzel text-2xl font-bold text-gold" style={{ textShadow: '0 0 10px #ffd70066' }}>
                         {trainer.name}
@@ -107,26 +158,23 @@ export default function TrainersPage() {
                     </div>
                   </div>
 
-                  {/* Stats & Info */}
                   <div className="flex-1 flex flex-col gap-6">
-                    {/* Role */}
                     <div className="flex items-center gap-3">
-                      <Shield className="w-5 h-5 text-gold" />
+                      <Shield className="w-5 h-5 text-gold" weight="bold" />
                       <span className="text-sm text-gray-300">
                         <span className="text-gray-500 uppercase tracking-wider text-[10px] font-semibold mr-2">Role</span>
                         {trainer.role}
                       </span>
                     </div>
 
-                    {/* Stat Bars */}
                     <div className="space-y-3">
-                      <p className="text-[10px] text-gray-500 uppercase tracking-[3px] font-semibold">// Core Stats</p>
+                      <p className="text-[10px] text-gray-500 font-semibold" style={{ fontVariant: 'small-caps', letterSpacing: '0.1em' }}>Core stats</p>
                       <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                         {[
-                          { label: 'STR', value: trainer.stats.str, icon: <Sword className="w-3.5 h-3.5" />, color: 'text-red-400' },
-                          { label: 'CON', value: trainer.stats.con, icon: <Heart className="w-3.5 h-3.5" />, color: 'text-green-400' },
-                          { label: 'INT', value: trainer.stats.int, icon: <Brain className="w-3.5 h-3.5" />, color: 'text-blue-400' },
-                          { label: 'WIS', value: trainer.stats.wis, icon: <Star className="w-3.5 h-3.5" />, color: 'text-purple-400' },
+                          { label: 'STR', value: trainer.stats.str, icon: <Sword className="w-3.5 h-3.5" weight="bold" />, color: 'text-red-400' },
+                          { label: 'CON', value: trainer.stats.con, icon: <Heart className="w-3.5 h-3.5" weight="bold" />, color: 'text-green-400' },
+                          { label: 'INT', value: trainer.stats.int, icon: <Brain className="w-3.5 h-3.5" weight="bold" />, color: 'text-blue-400' },
+                          { label: 'WIS', value: trainer.stats.wis, icon: <Star className="w-3.5 h-3.5" weight="bold" />, color: 'text-purple-400' },
                         ].map((stat) => (
                           <div key={stat.label} className="flex items-center gap-3">
                             <div className={`w-6 flex items-center ${stat.color}`}>
@@ -142,9 +190,8 @@ export default function TrainersPage() {
                       </div>
                     </div>
 
-                    {/* Traits */}
                     <div>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-[3px] font-semibold mb-2">// Traits</p>
+                      <p className="text-[10px] text-gray-500 font-semibold mb-2" style={{ fontVariant: 'small-caps', letterSpacing: '0.1em' }}>Traits</p>
                       <div className="flex flex-wrap gap-2">
                         {trainer.traits.map((trait) => (
                           <span
@@ -158,7 +205,6 @@ export default function TrainersPage() {
                       </div>
                     </div>
 
-                    {/* Bio */}
                     <div className="hud-panel p-4 relative">
                       <div className="corner-decor-tl" style={{ width: '10px', height: '10px' }} />
                       <div className="corner-decor-tr" style={{ width: '10px', height: '10px' }} />
@@ -169,7 +215,6 @@ export default function TrainersPage() {
                   </div>
                 </div>
 
-                {/* Bottom XP bar */}
                 <div className="px-6 pb-4">
                   <div className="flex justify-between text-[9px] text-gray-500 uppercase tracking-wider mb-1">
                     <span>Reputation</span>
@@ -183,7 +228,6 @@ export default function TrainersPage() {
             ))}
           </div>
 
-          {/* Join the Party CTA */}
           <div className="mt-12 text-center">
             <div className="hud-panel p-8 inline-block relative">
               <div className="corner-decor-tl" />
@@ -194,7 +238,7 @@ export default function TrainersPage() {
                 className="hud-btn-gold font-rajdhani inline-flex items-center gap-2"
               >
                 View Plans
-                <ChevronRight className="w-4 h-4" />
+                <CaretRight className="w-4 h-4" weight="bold" />
               </button>
             </div>
           </div>

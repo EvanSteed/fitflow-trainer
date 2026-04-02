@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Users, DollarSign, Clock, Mail, Phone,
-  Calendar, Search, ChevronRight, LogOut, Dumbbell
-} from 'lucide-react'
+  Users, CurrencyDollar, Clock, EnvelopeSimple, Phone, Calendar,
+  MagnifyingGlass, CaretRight, SignOut, Barbell, WarningCircle, ListDashes
+} from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+import GameHudHeader from '../components/GameHudHeader'
 
 interface Client {
   id: string
@@ -26,6 +27,40 @@ interface Client {
   created_at: string
 }
 
+function SkeletonRow() {
+  return (
+    <div className="p-4 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-hud-panel rounded-full" />
+          <div>
+            <div className="h-4 w-32 bg-hud-panel rounded mb-1.5" />
+            <div className="h-3 w-44 bg-hud-panel rounded" />
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="h-5 w-16 bg-hud-panel rounded-full" />
+          <div className="w-5 h-5 bg-hud-panel rounded" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SkeletonStat() {
+  return (
+    <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="h-3 w-20 bg-slate-200 rounded mb-2" />
+          <div className="h-7 w-16 bg-slate-200 rounded" />
+        </div>
+        <div className="w-12 h-12 bg-slate-200 rounded-xl" />
+      </div>
+    </div>
+  )
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate()
   const [clients, setClients] = useState<Client[]>([])
@@ -33,18 +68,23 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const fetchClients = async () => {
-      const { data, error } = await supabase
-        .from('clients')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) {
-        console.error('Error fetching clients:', error)
-      } else {
-        setClients(data || [])
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('clients')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (fetchError) {
+          setError(`Failed to load clients: ${fetchError.message}`)
+        } else {
+          setClients(data || [])
+        }
+      } catch (err) {
+        setError('Unable to connect to the database. Please try again later.')
       }
       setLoading(false)
     }
@@ -55,7 +95,7 @@ export default function AdminDashboard() {
   const filteredClients = clients.filter(client => {
     const matchesSearch = client.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filter === 'all' || 
+    const matchesFilter = filter === 'all' ||
       (filter === 'pending' && client.status === 'pending') ||
       (filter === 'completed' && client.status === 'completed')
     return matchesSearch && matchesFilter
@@ -80,12 +120,11 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Dumbbell className="w-6 h-6 text-white" />
+              <Barbell className="w-6 h-6 text-white" weight="bold" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-900">Stat Stackers Dashboard</h1>
@@ -100,48 +139,69 @@ export default function AdminDashboard() {
               View Landing Page
             </button>
             <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-              <LogOut className="w-5 h-5 text-slate-600" />
+              <SignOut className="w-5 h-5 text-slate-600" weight="bold" />
             </button>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+            <WarningCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" weight="bold" />
+            <div>
+              <p className="text-sm font-medium text-red-800">Connection Error</p>
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          </div>
+        )}
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Total Clients</p>
-                <p className="text-2xl font-bold text-slate-900">{clients.length}</p>
+          {loading ? (
+            <>
+              <SkeletonStat />
+              <SkeletonStat />
+              <SkeletonStat />
+            </>
+          ) : (
+            <>
+              <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-500">Total Clients</p>
+                    <p className="text-2xl font-bold text-slate-900">{clients.length}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <Users className="w-6 h-6 text-blue-600" weight="bold" />
+                  </div>
+                </div>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-500">Total Revenue</p>
+                    <p className="text-2xl font-bold text-emerald-600">${totalRevenue.toFixed(2)}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <CurrencyDollar className="w-6 h-6 text-emerald-600" weight="bold" />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Total Revenue</p>
-                <p className="text-2xl font-bold text-emerald-600">${totalRevenue.toFixed(2)}</p>
+              <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-500">Pending Payments</p>
+                    <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-yellow-600" weight="bold" />
+                  </div>
+                </div>
               </div>
-              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-emerald-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Pending Payments</p>
-                <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                <Clock className="w-6 h-6 text-yellow-600" />
-              </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
         {/* Main Content */}
@@ -151,7 +211,7 @@ export default function AdminDashboard() {
             <div className="p-4 border-b border-slate-100">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1 relative">
-                  <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <MagnifyingGlass className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" weight="bold" />
                   <input
                     type="text"
                     placeholder="Search clients..."
@@ -176,9 +236,30 @@ export default function AdminDashboard() {
 
             <div className="divide-y divide-slate-100">
               {loading ? (
-                <div className="p-8 text-center text-slate-500">Loading clients...</div>
+                <>
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                </>
               ) : filteredClients.length === 0 ? (
-                <div className="p-8 text-center text-slate-500">No clients found</div>
+                <div className="p-12 text-center">
+                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <ListDashes className="w-8 h-8 text-slate-300" weight="duotone" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-1">No clients yet</h3>
+                  <p className="text-sm text-slate-500 mb-6 max-w-xs mx-auto">
+                    When clients complete the intake form and payment, they'll appear here. Share your landing page to get started.
+                  </p>
+                  <button
+                    onClick={() => navigate('/pricing')}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    View Pricing Page
+                    <CaretRight className="w-4 h-4" weight="bold" />
+                  </button>
+                </div>
               ) : (
                 filteredClients.map((client) => (
                   <div
@@ -208,7 +289,7 @@ export default function AdminDashboard() {
                         }`}>
                           {client.status}
                         </span>
-                        <ChevronRight className="w-5 h-5 text-slate-400" />
+                        <CaretRight className="w-5 h-5 text-slate-400" weight="bold" />
                       </div>
                     </div>
                   </div>
@@ -236,28 +317,26 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="p-6 space-y-6">
-                  {/* Contact Info */}
                   <div>
                     <h3 className="text-sm font-semibold text-slate-500 mb-3">Contact Information</h3>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm">
-                        <Mail className="w-4 h-4 text-slate-400" />
+                        <EnvelopeSimple className="w-4 h-4 text-slate-400" weight="bold" />
                         <span className="text-slate-700">{selectedClient.email}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
-                        <Phone className="w-4 h-4 text-slate-400" />
+                        <Phone className="w-4 h-4 text-slate-400" weight="bold" />
                         <span className="text-slate-700">{selectedClient.phone}</span>
                       </div>
                       {selectedClient.age && (
                         <div className="flex items-center gap-2 text-sm">
-                          <Calendar className="w-4 h-4 text-slate-400" />
+                          <Calendar className="w-4 h-4 text-slate-400" weight="bold" />
                           <span className="text-slate-700">Age: {selectedClient.age}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Goals */}
                   {selectedClient.goals && selectedClient.goals.length > 0 && (
                     <div>
                       <h3 className="text-sm font-semibold text-slate-500 mb-3">Goals</h3>
@@ -271,7 +350,6 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  {/* Training Details */}
                   <div>
                     <h3 className="text-sm font-semibold text-slate-500 mb-3">Training Details</h3>
                     <div className="space-y-2 text-sm">
@@ -296,7 +374,6 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  {/* Equipment */}
                   {selectedClient.equipment_access && selectedClient.equipment_access.length > 0 && (
                     <div>
                       <h3 className="text-sm font-semibold text-slate-500 mb-3">Equipment Access</h3>
@@ -310,7 +387,6 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  {/* Injuries */}
                   {selectedClient.injuries && (
                     <div>
                       <h3 className="text-sm font-semibold text-slate-500 mb-3">Injuries/Conditions</h3>
@@ -320,7 +396,6 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  {/* Package */}
                   {selectedClient.package_name && (
                     <div>
                       <h3 className="text-sm font-semibold text-slate-500 mb-3">Package</h3>
@@ -331,12 +406,11 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  {/* Actions */}
                   <div className="flex gap-2 pt-4 border-t border-slate-100">
-                    <button className="flex-1 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    <button className="flex-1 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors active:scale-[0.98]">
                       Create Program
                     </button>
-                    <button className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">
+                    <button className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors active:scale-[0.98]">
                       Send Message
                     </button>
                   </div>
@@ -344,7 +418,7 @@ export default function AdminDashboard() {
               </>
             ) : (
               <div className="p-12 text-center">
-                <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" weight="duotone" />
                 <p className="text-slate-500">Select a client to view details</p>
               </div>
             )}

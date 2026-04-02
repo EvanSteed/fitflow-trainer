@@ -1,7 +1,13 @@
+import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CheckCircle, ChevronRight, Shield, Target, Crown, Star, Zap } from 'lucide-react'
+import { CheckCircle, CaretRight, Shield, Target, Crown, Star, Lightning } from '@phosphor-icons/react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
 import GameHudHeader from '../components/GameHudHeader'
 import GameHudFooter from '../components/GameHudFooter'
+
+gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 interface PricingTier {
   id: string
@@ -24,7 +30,7 @@ const tiers: PricingTier[] = [
     tierLabel: 'TIER 1',
     price: '$79/mo',
     priceNote: 'Get started with structure',
-    icon: <Shield className="w-7 h-7 text-teal" />,
+    icon: <Shield className="w-7 h-7 text-teal" weight="bold" />,
     features: [
       'Pre-made workout programs',
       'Access to general resources',
@@ -41,7 +47,7 @@ const tiers: PricingTier[] = [
     tierLabel: 'TIER 2',
     price: '$199/mo',
     priceNote: 'Level up with guidance',
-    icon: <Target className="w-7 h-7 text-gold" />,
+    icon: <Target className="w-7 h-7 text-gold" weight="bold" />,
     features: [
       'Everything in Basic',
       'Weekly check-ins',
@@ -60,7 +66,7 @@ const tiers: PricingTier[] = [
     tierLabel: 'TIER 3',
     price: '$399/mo',
     priceNote: 'Full access, full support',
-    icon: <Crown className="w-7 h-7 text-gold" />,
+    icon: <Crown className="w-7 h-7 text-gold" weight="bold" />,
     features: [
       'Everything in Coaching',
       'Bi-weekly video calls',
@@ -77,22 +83,52 @@ const tiers: PricingTier[] = [
 
 export default function PricingPage() {
   const navigate = useNavigate()
+  const containerRef = useRef(null)
+
+  useGSAP(() => {
+    gsap.utils.toArray<HTMLElement>('.xp-bar-fill').forEach((bar) => {
+      const targetWidth = bar.style.width || bar.getAttribute('data-width') || '50%'
+      gsap.fromTo(bar,
+        { width: '0%' },
+        {
+          width: targetWidth,
+          duration: 1.5,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: bar,
+            start: 'top 90%',
+            once: true,
+          },
+        }
+      )
+    })
+
+    ScrollTrigger.batch('.tier-card', {
+      onEnter: (elements) => {
+        gsap.fromTo(elements,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, stagger: 0.15, duration: 0.7, ease: 'power3.out', overwrite: true }
+        )
+      },
+      start: 'top 85%',
+    })
+  }, { scope: containerRef })
 
   const handleSelect = (tier: PricingTier) => {
-    localStorage.setItem('selectedTier', JSON.stringify({
+    localStorage.setItem('selectedPackage', JSON.stringify({
       id: tier.id,
       name: tier.name,
       price: tier.price,
+      description: tier.priceNote,
       features: tier.features,
     }))
     navigate('/intake')
   }
 
   return (
-    <div className="min-h-screen bg-hud-bg font-rajdhani">
+    <div ref={containerRef} className="min-h-screen bg-hud-bg font-rajdhani">
       <GameHudHeader />
 
-      {/* Hero */}
       <section className="py-16 md:py-20 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={{
           backgroundImage: 'linear-gradient(#ffd700 1px, transparent 1px), linear-gradient(90deg, #ffd700 1px, transparent 1px)',
@@ -101,8 +137,8 @@ export default function PricingPage() {
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-hud-panel border border-gold/30 px-5 py-2.5 mb-8" style={{ clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}>
-            <Star className="w-4 h-4 text-gold" />
-            <span className="text-sm text-gold font-semibold tracking-wider uppercase font-rajdhani">Choose your path</span>
+            <Star className="w-4 h-4 text-gold" weight="fill" />
+            <span className="text-sm text-gold font-semibold tracking-wide font-rajdhani">Choose your path</span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 font-cinzel tracking-wide">
@@ -116,22 +152,21 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Pricing Tiers */}
       <section className="pb-16 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-6 items-stretch">
+          <div className="grid md:grid-cols-3 gap-6 items-stretch stagger-enter">
             {tiers.map((tier) => (
               <div
                 key={tier.id}
-                className={`hud-card relative flex flex-col h-full ${
+                className={`tier-card hud-card relative flex flex-col h-full ${
                   tier.ctaStyle === 'coaching'
                     ? 'hud-card-featured !border-gold'
                     : tier.ctaStyle === 'vip'
                     ? '!border-gold/40 hover:!border-gold'
                     : ''
                 }`}
+                style={{ opacity: 0 }}
               >
-                {/* Corner decorations for featured */}
                 {tier.ctaStyle === 'coaching' && (
                   <>
                     <div className="corner-decor-tl" />
@@ -151,7 +186,6 @@ export default function PricingPage() {
                   </div>
                 )}
                 <div className="p-6 flex flex-col flex-grow">
-                  {/* Tier Label */}
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-bold text-gray-500 tracking-widest font-rajdhani">{tier.tierLabel}</p>
                     <span className="text-[10px] text-teal font-bold bg-hud-bg border border-teal/30 px-2 py-0.5 rounded">
@@ -159,7 +193,6 @@ export default function PricingPage() {
                     </span>
                   </div>
 
-                  {/* Icon & Name */}
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-12 h-12 rounded flex items-center justify-center border ${
                       tier.ctaStyle === 'vip' ? 'bg-gold/10 border-gold/30' : 'bg-hud-bg border-hud-border'
@@ -169,36 +202,32 @@ export default function PricingPage() {
                     <h3 className="text-xl font-bold text-white font-rajdhani">{tier.name}</h3>
                   </div>
 
-                  {/* Price */}
                   <div className="mb-6">
                     <span className="text-3xl font-bold text-white font-rajdhani">{tier.price}</span>
-                    <p className="text-sm text-gray-400 mt-1">{tier.priceNote}</p>
+                    <p className="text-base text-gray-400 mt-1">{tier.priceNote}</p>
                   </div>
 
-                  {/* Features */}
                   <ul className="space-y-3 mb-8 flex-grow">
                     {tier.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-3 text-sm text-gray-300">
+                      <li key={idx} className="flex items-start gap-3 text-base text-gray-300">
                         <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
                           tier.ctaStyle === 'vip' ? 'text-gold' : 'text-teal'
-                        }`} />
+                        }`} weight="fill" />
                         {feature}
                       </li>
                     ))}
                   </ul>
 
-                  {/* XP Progress bar */}
                   <div className="mb-5">
                     <div className="flex justify-between text-[9px] text-gray-500 uppercase tracking-wider mb-1">
                       <span>Level Progress</span>
                       <span>{tier.ctaStyle === 'basic' ? '35%' : tier.ctaStyle === 'coaching' ? '65%' : '100%'}</span>
                     </div>
                     <div className="xp-bar-track">
-                      <div className="xp-bar-fill" style={{ width: tier.ctaStyle === 'basic' ? '35%' : tier.ctaStyle === 'coaching' ? '65%' : '100%' }} />
+                      <div className="xp-bar-fill" data-width={tier.ctaStyle === 'basic' ? '35%' : tier.ctaStyle === 'coaching' ? '65%' : '100%'} style={{ width: '0%' }} />
                     </div>
                   </div>
 
-                  {/* CTA */}
                   <button
                     onClick={() => handleSelect(tier)}
                     className={`w-full py-3 font-semibold transition-all flex items-center justify-center gap-2 font-rajdhani uppercase tracking-wider text-sm ${
@@ -215,7 +244,7 @@ export default function PricingPage() {
                     } : {}}
                   >
                     {tier.cta}
-                    <ChevronRight className="w-4 h-4" />
+                    <CaretRight className="w-4 h-4" weight="bold" />
                   </button>
                 </div>
               </div>
@@ -224,18 +253,17 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Comparison Note */}
       <section className="py-12 px-4 bg-hud-panel/50">
         <div className="max-w-3xl mx-auto text-center">
           <div className="hud-panel p-8 relative">
             <div className="corner-decor-tl" />
             <div className="corner-decor-tr" />
 
-            <Zap className="w-8 h-8 text-gold mx-auto mb-4" />
+            <Lightning className="w-8 h-8 text-gold mx-auto mb-4" weight="fill" />
             <h2 className="text-2xl font-bold text-white mb-4 font-rajdhani">
               Not sure which tier is right for you?
             </h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-400 mb-6 text-base leading-relaxed">
               Start with Basic to get a feel for the system. You can upgrade anytime.
               Every tier builds on the last. Your stats carry over, and you keep all your progress.
             </p>

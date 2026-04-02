@@ -1,23 +1,40 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CreditCard, Lock, ArrowLeft, Check, Shield } from 'lucide-react'
+import { CreditCard, Lock, ArrowLeft, Check, Shield, WarningCircle, LockKey } from '@phosphor-icons/react'
+import GameHudHeader from '../components/GameHudHeader'
+import GameHudFooter from '../components/GameHudFooter'
 
 export default function PaymentPage() {
   const navigate = useNavigate()
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('card')
+  const [error, setError] = useState('')
+
+  // Bound form state
+  const [cardNumber, setCardNumber] = useState('')
+  const [expiry, setExpiry] = useState('')
+  const [cvc, setCvc] = useState('')
+  const [nameOnCard, setNameOnCard] = useState('')
 
   const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
   const clientData = JSON.parse(localStorage.getItem('clientData') || '{}')
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
+
+    if (paymentMethod === 'card') {
+      if (!cardNumber.trim() || !expiry.trim() || !cvc.trim() || !nameOnCard.trim()) {
+        setError('Please fill in all card details.')
+        return
+      }
+    }
+
     setIsProcessing(true)
 
     // Simulate payment processing
     await new Promise(resolve => setTimeout(resolve, 2000))
 
-    // Store payment status
     localStorage.setItem('paymentStatus', 'completed')
     localStorage.setItem('paymentAmount', selectedPackage.price)
 
@@ -25,180 +42,209 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <CreditCard className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Complete Your Purchase</h1>
-          <p className="text-slate-600">Secure checkout powered by Stripe</p>
-        </div>
+    <div className="min-h-screen bg-hud-bg font-rajdhani">
+      <GameHudHeader />
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Order Summary */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Order Summary</h2>
-            <div className="border-b border-slate-200 pb-4 mb-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <p className="font-semibold text-slate-900">{selectedPackage.name}</p>
-                  <p className="text-sm text-slate-500">{selectedPackage.description}</p>
-                </div>
-                <p className="font-bold text-slate-900">${selectedPackage.price}</p>
-              </div>
+      <section className="py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 hud-card flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="w-8 h-8 text-gold" weight="bold" />
             </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-600">Subtotal</span>
-                <span className="text-slate-900">${selectedPackage.price}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Tax</span>
-                <span className="text-slate-900">$0.00</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t border-slate-200 font-bold">
-                <span className="text-slate-900">Total</span>
-                <span className="text-emerald-600">${selectedPackage.price}</span>
-              </div>
-            </div>
-
-            {/* Client Info Summary */}
-            <div className="mt-6 pt-4 border-t border-slate-200">
-              <h3 className="font-semibold text-slate-900 mb-2">Client Information</h3>
-              <div className="space-y-1 text-sm text-slate-600">
-                <p>{clientData.fullName}</p>
-                <p>{clientData.email}</p>
-                <p>{clientData.phone}</p>
-              </div>
-            </div>
+            <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2">// Checkout</p>
+            <h1 className="text-2xl font-bold text-white font-cinzel">Complete Your Purchase</h1>
+            <p className="text-sm text-gray-400 mt-1">Secure checkout powered by Stripe</p>
           </div>
 
-          {/* Payment Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Payment Details</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Order Summary */}
+            <div className="hud-card p-6 relative">
+              <div className="corner-decor-tl" />
+              <div className="corner-decor-tr" />
 
-            <form onSubmit={handlePayment} className="space-y-4">
-              {/* Payment Method Selection */}
-              <div className="flex gap-2 mb-4">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('card')}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all ${
-                    paymentMethod === 'card'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  Card
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('paypal')}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all ${
-                    paymentMethod === 'paypal'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  PayPal
-                </button>
+              <h2 className="text-lg font-bold text-white mb-4 font-rajdhani">Order Summary</h2>
+              <div className="border-b border-hud-border pb-4 mb-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="font-semibold text-white">{selectedPackage.name}</p>
+                    <p className="text-sm text-gray-500">{selectedPackage.description}</p>
+                  </div>
+                  <p className="font-bold text-white font-rajdhani">{selectedPackage.price}</p>
+                </div>
               </div>
-
-              {paymentMethod === 'card' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Card Number</label>
-                    <input
-                      type="text"
-                      placeholder="4242 4242 4242 4242"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Expiry</label>
-                      <input
-                        type="text"
-                        placeholder="MM/YY"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">CVC</label>
-                      <input
-                        type="text"
-                        placeholder="123"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Name on Card</label>
-                    <input
-                      type="text"
-                      placeholder="John Doe"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
-                    />
-                  </div>
-                </>
-              )}
-
-              {paymentMethod === 'paypal' && (
-                <div className="py-8 text-center">
-                  <p className="text-slate-600 mb-4">You will be redirected to PayPal to complete your purchase.</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Subtotal</span>
+                  <span className="text-white">{selectedPackage.price}</span>
                 </div>
-              )}
-
-              {/* Security Badges */}
-              <div className="flex items-center justify-center gap-4 pt-4">
-                <div className="flex items-center gap-1 text-xs text-slate-500">
-                  <Lock className="w-4 h-4" />
-                  <span>Secure</span>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Tax</span>
+                  <span className="text-white">$0.00</span>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-slate-500">
-                  <Shield className="w-4 h-4" />
-                  <span>SSL Encrypted</span>
+                <div className="flex justify-between pt-2 border-t border-hud-border font-bold">
+                  <span className="text-white">Total</span>
+                  <span className="text-gold font-rajdhani">{selectedPackage.price}</span>
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isProcessing}
-                className="w-full py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isProcessing ? (
+              {/* Client Info */}
+              <div className="mt-6 pt-4 border-t border-hud-border">
+                <h3 className="font-semibold text-white mb-2 text-sm font-rajdhani uppercase tracking-wider">Client Information</h3>
+                <div className="space-y-1 text-sm text-gray-400">
+                  <p>{clientData.fullName}</p>
+                  <p>{clientData.email}</p>
+                  <p>{clientData.phone}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Form */}
+            <div className="hud-card p-6 relative">
+              <div className="corner-decor-tl" />
+              <div className="corner-decor-tr" />
+
+              <h2 className="text-lg font-bold text-white mb-4 font-rajdhani">Payment Details</h2>
+
+              <form onSubmit={handlePayment} className="space-y-4">
+                {/* Payment Method Selection */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('card')}
+                    className={`flex-1 py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
+                      paymentMethod === 'card'
+                        ? 'bg-gold text-hud-bg'
+                        : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
+                    }`}
+                  >
+                    Card
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('paypal')}
+                    className={`flex-1 py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
+                      paymentMethod === 'paypal'
+                        ? 'bg-gold text-hud-bg'
+                        : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
+                    }`}
+                  >
+                    PayPal
+                  </button>
+                </div>
+
+                {paymentMethod === 'card' && (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-5 h-5" />
-                    Pay ${selectedPackage.price}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Card Number</label>
+                      <input
+                        type="text"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                        placeholder="4242 4242 4242 4242"
+                        className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Expiry</label>
+                        <input
+                          type="text"
+                          value={expiry}
+                          onChange={(e) => setExpiry(e.target.value)}
+                          placeholder="MM/YY"
+                          className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">CVC</label>
+                        <input
+                          type="text"
+                          value={cvc}
+                          onChange={(e) => setCvc(e.target.value)}
+                          placeholder="123"
+                          className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Name on Card</label>
+                      <input
+                        type="text"
+                        value={nameOnCard}
+                        onChange={(e) => setNameOnCard(e.target.value)}
+                        placeholder="John Doe"
+                        className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                      />
+                    </div>
                   </>
                 )}
-              </button>
 
-              <p className="text-xs text-center text-slate-500">
-                By completing this purchase, you agree to our Terms of Service and Privacy Policy.
-              </p>
-            </form>
+                {paymentMethod === 'paypal' && (
+                  <div className="py-8 text-center">
+                    <p className="text-gray-400">You will be redirected to PayPal to complete your purchase.</p>
+                  </div>
+                )}
+
+                {/* Error */}
+                {error && (
+                  <div className="p-3 rounded bg-red-900/20 border border-red-500/40 flex items-start gap-2">
+                    <WarningCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" weight="bold" />
+                    <p className="text-sm text-red-300">{error}</p>
+                  </div>
+                )}
+
+                {/* Security Badges */}
+                <div className="flex items-center justify-center gap-4 pt-2">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                    <Lock className="w-3.5 h-3.5" weight="bold" />
+                    <span>Secure</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                    <LockKey className="w-3.5 h-3.5" weight="bold" />
+                    <span>SSL Encrypted</span>
+                  </div>
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={isProcessing}
+                  className="w-full py-4 bg-gold text-hud-bg font-bold rounded hover:bg-gold/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-rajdhani uppercase tracking-wider text-sm"
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-hud-bg border-t-transparent rounded-full animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-5 h-5" weight="bold" />
+                      Pay {selectedPackage.price}
+                    </>
+                  )}
+                </button>
+
+                <p className="text-xs text-center text-gray-600">
+                  By completing this purchase, you agree to our Terms of Service and Privacy Policy.
+                </p>
+              </form>
+            </div>
+          </div>
+
+          {/* Back Button */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => navigate('/intake')}
+              className="flex items-center gap-2 text-gray-500 hover:text-gold transition-colors mx-auto font-rajdhani text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" weight="bold" /> Back to Intake
+            </button>
           </div>
         </div>
+      </section>
 
-        {/* Back Button */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => navigate('/intake')}
-            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mx-auto"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Intake
-          </button>
-        </div>
-      </div>
+      <GameHudFooter />
     </div>
   )
 }

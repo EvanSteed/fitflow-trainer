@@ -8,6 +8,7 @@ import SuccessPage from './pages/SuccessPage'
 import ServicePage from './pages/ServicePage'
 import TrainersPage from './pages/TrainersPage'
 import WhatWeDoPage from './pages/WhatWeDoPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/success" element={<SuccessPage />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/service/:serviceId" element={<ServicePage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   )
