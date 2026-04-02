@@ -66,13 +66,14 @@ function XpBarAnimated({ width, className = '' }: { width: string; className?: s
 }
 
 function Portal() {
-  const portalRef = useRef<HTMLDivElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
   const navigate = useNavigate()
 
   useGSAP(() => {
-    if (!portalRef.current) return
-    const glow = portalRef.current.querySelector('.portal-glow')
-    const particles = portalRef.current.querySelectorAll('.portal-particle')
+    if (!wrapperRef.current) return
+    const glow = wrapperRef.current.querySelector('.portal-glow')
+    const particles = wrapperRef.current.querySelectorAll('.portal-particle')
 
     // Glow pulse
     gsap.to(glow, {
@@ -100,29 +101,28 @@ function Portal() {
         }
       )
     })
-  }, { scope: portalRef })
+  }, { scope: wrapperRef })
 
   const handleHover = (e: React.MouseEvent) => {
-    if (!portalRef.current) return
-    const rect = portalRef.current.getBoundingClientRect()
+    if (!imgRef.current) return
+    const rect = imgRef.current.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10
     const y = ((e.clientY - rect.top) / rect.height - 0.5) * 10
-    gsap.to(portalRef.current, { rotationY: x, rotationX: -y, duration: 0.4, ease: 'power2.out' })
+    gsap.to(imgRef.current, { rotationY: x, rotationX: -y, scale: 1.05, duration: 0.4, ease: 'power2.out', transformPerspective: 800 })
   }
 
   const handleLeave = () => {
-    gsap.to(portalRef.current, { rotationY: 0, rotationX: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' })
+    gsap.to(imgRef.current, { rotationY: 0, rotationX: 0, scale: 1, duration: 0.6, ease: 'elastic.out(1, 0.5)' })
   }
 
   const handleClick = () => {
-    if (!portalRef.current) return
-    const wrapper = portalRef.current.querySelector('.portal-wrapper')
-    gsap.to(wrapper, {
-      scale: 1.08,
+    if (!wrapperRef.current) return
+    gsap.to(wrapperRef.current, {
+      scale: 1.06,
       duration: 0.2,
       ease: 'power2.in',
       onComplete: () => {
-        gsap.to(wrapper, {
+        gsap.to(wrapperRef.current, {
           scale: 1,
           duration: 0.3,
           ease: 'power2.out',
@@ -134,27 +134,18 @@ function Portal() {
 
   return (
     <div className="flex flex-col items-center mt-12">
-      <div
-        ref={portalRef}
-        onClick={handleClick}
-        onMouseMove={handleHover}
-        onMouseLeave={handleLeave}
-        className="relative cursor-pointer"
-        style={{
-          perspective: '800px',
-          width: '580px',
-          height: '580px',
-        }}
-      >
-        {/* Portal image - base layer */}
-        <div className="portal-wrapper absolute inset-0 flex items-center justify-center">
-          <img
-            src="/images/portal.png?v=4"
-            alt="Enter the portal"
-            className="w-full h-full object-contain"
-            draggable={false}
-          />
-        </div>
+      {/* Portal image - size controlled by image */}
+      <div ref={wrapperRef} className="portal-wrapper relative cursor-pointer" style={{ width: '580px' }}
+        onClick={handleClick}>
+        <img
+          ref={imgRef}
+          src="/images/portal.png?v=5"
+          alt="Enter the portal"
+          className="w-full block cursor-pointer"
+          draggable={false}
+          onMouseMove={handleHover}
+          onMouseLeave={handleLeave}
+        />
 
         {/* Ambient glow overlay - centered on portal */}
         <div className="portal-glow absolute pointer-events-none"
@@ -162,26 +153,26 @@ function Portal() {
             top: '-5%',
             left: '10%',
             width: '80%',
-            height: '70%',
-            background: 'radial-gradient(circle, rgba(249,115,22,0.2) 0%, rgba(59,130,246,0.12) 40%, transparent 70%)',
-            filter: 'blur(25px)',
+            height: '80%',
+            background: 'radial-gradient(circle, rgba(249,115,22,0.25) 0%, rgba(59,130,246,0.15) 40%, transparent 70%)',
+            filter: 'blur(30px)',
             zIndex: 2,
           }}
         />
 
         {/* Floating particles - centered on portal */}
-        {Array.from({ length: 12 }).map((_, i) => (
+        {Array.from({ length: 16 }).map((_, i) => (
           <div
             key={i}
             className="portal-particle absolute pointer-events-none rounded-full"
             style={{
               zIndex: 3,
-              width: i % 3 === 0 ? '3px' : '2px',
-              height: i % 3 === 0 ? '3px' : '2px',
+              width: i % 3 === 0 ? '5px' : i % 3 === 1 ? '4px' : '3px',
+              height: i % 3 === 0 ? '5px' : i % 3 === 1 ? '4px' : '3px',
               background: i % 2 === 0 ? '#60a5fa' : '#fb923c',
-              left: `${35 + Math.random() * 30}%`,
+              left: `${32 + Math.random() * 36}%`,
               top: `${20 + Math.random() * 15}%`,
-              boxShadow: `0 0 6px ${i % 2 === 0 ? '#60a5fa' : '#fb923c'}`,
+              boxShadow: `0 0 8px ${i % 2 === 0 ? '#60a5fa' : '#fb923c'}, 0 0 16px ${i % 2 === 0 ? '#3b82f644' : '#f9731644'}`,
             }}
           />
         ))}
@@ -189,7 +180,7 @@ function Portal() {
 
       <button
         onClick={() => navigate('/pricing')}
-        className="mt-3 hud-btn-gold font-rajdhani text-sm inline-flex items-center gap-2"
+        className="mt-0 hud-btn-gold font-rajdhani text-sm inline-flex items-center gap-2"
       >
         Step Through the Portal
         <CaretRight className="w-4 h-4" weight="bold" />
