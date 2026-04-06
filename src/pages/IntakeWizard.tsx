@@ -135,28 +135,33 @@ export default function IntakeWizard() {
     setIsSubmitting(true)
     setErrors({})
 
-    const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
+      const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
 
-    try {
-      const { data: client, error } = await supabase
-        .from('clients')
-        .insert({
-          full_name: data.fullName,
-          email: data.email,
-          phone: data.phone,
-          age: data.age || null,
-          gender: data.gender || null,
-          goals: data.goals,
-          experience_level: data.experienceLevel,
-          injuries: data.injuries || null,
-          equipment_access: data.equipmentAccess,
-          days_per_week: data.daysPerWeek,
-          location: data.location || null,
-          delivery_method: data.deliveryMethod,
-          package_name: selectedPackage.name || null,
-          package_price: selectedPackage.price || null,
-          status: 'pending'
-        })
+      // Clean and parse the price to ensure it's a valid integer
+      const cleanPrice = selectedPackage.price
+        ? Math.round(parseFloat(selectedPackage.price.toString().replace(/[^0-9.-]/g, '')))
+        : null
+
+      try {
+        const { data: client, error } = await supabase
+          .from('clients')
+          .insert({
+            full_name: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            age: data.age || null,
+            gender: data.gender || null,
+            goals: data.goals,
+            experience_level: data.experienceLevel,
+            injuries: data.injuries || null,
+            equipment_access: data.equipmentAccess,
+            days_per_week: data.daysPerWeek,
+            location: data.location || null,
+            delivery_method: data.deliveryMethod,
+            package_name: selectedPackage.name || null,
+            package_price: cleanPrice,
+            status: 'pending'
+          })
         .select()
         .single()
 
