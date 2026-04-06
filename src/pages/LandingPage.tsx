@@ -340,12 +340,7 @@ export default function LandingPage() {
             Stop guessing, start stacking.
           </p>
 
-          {/* Hero Stats Bar */}
-          <div className="flex justify-center gap-8 mb-10">
-            <StatCounter value={99} label="STR" icon={<Barbell className="w-4 h-4" weight="bold" />} />
-            <StatCounter value={85} label="NUTR" icon={<AppleLogo className="w-4 h-4" weight="bold" />} />
-            <StatCounter value={72} label="MIND" icon={<ShieldCheck className="w-4 h-4" weight="bold" />} />
-          </div>
+
 
           {/* Portal */}
           <Portal />
@@ -375,13 +370,13 @@ export default function LandingPage() {
                 xp: '+Fitness',
                 stat: 'STR',
               },
-              {
-                icon: <AppleLogo className="w-7 h-7 text-gold" weight="bold" />,
-                title: 'Nutritional Advice',
-                desc: 'Fuel your body right. Macros, meal prep, and eating better consistently. Your nutrition stat keeps stacking higher.',
-                xp: '+Energy',
-                stat: 'NUTR',
-              },
+               {
+                 icon: <AppleLogo className="w-7 h-7 text-gold" weight="bold" />,
+                 title: 'Nutritional Advice',
+                 desc: 'Fuel your body right. Macros, meal prep, and eating better consistently. Optimal nutrition is the greatest buff one can acquire.',
+                 xp: '+Energy',
+                 stat: 'NUTR',
+               },
               {
                 icon: <ShieldCheck className="w-7 h-7 text-gold" weight="bold" />,
                 title: 'Accountability',
@@ -389,13 +384,13 @@ export default function LandingPage() {
                 xp: '+Results',
                 stat: 'FOCUS',
               },
-              {
-                icon: <CheckCircle className="w-7 h-7 text-gold" weight="bold" />,
-                title: 'Habit Building',
-                desc: 'Sleep, recovery, daily routines. The boring stuff that separates Level 1 from Level 50. Progress compounds week by week.',
-                xp: '+Consistency',
-                stat: 'DISC',
-              },
+               {
+                 icon: <CheckCircle className="w-7 h-7 text-gold" weight="bold" />,
+                 title: 'Habit Building',
+                 desc: 'Champions are sculpted by the relentless cadence of daily virtue.',
+                 xp: '+Consistency',
+                 stat: 'DISC',
+               },
             ].map((quest, i) => (
               <div key={i} className="reveal-card hud-card p-6 group relative" style={{ opacity: 0 }}>
                 <div className="corner-decor-tl" />
@@ -429,7 +424,7 @@ export default function LandingPage() {
           <div className="text-center mb-12">
             <p className="section-label text-xs text-gold font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Strategy guide</p>
             <h2 className="section-heading hud-section-title text-3xl md:text-4xl font-bold mb-4">
-              Tips to Stack Stats Faster
+              How to rank up
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto text-base leading-relaxed">
               Progress isn't about being perfect. It's about being consistent. Here's how to keep leveling up week after week.
@@ -438,7 +433,7 @@ export default function LandingPage() {
 
           <div className="space-y-4">
             {[
-              { icon: <TrendUp className="w-5 h-5 text-teal" weight="bold" />, title: 'Start small, stack daily', desc: 'Don\'t try to max every stat on Day 1. Pick one habit, lock it in for a week, then add another. Small wins compound into massive gains.', level: 'Lv.1' },
+               { icon: <TrendUp className="w-5 h-5 text-teal" weight="bold" />, title: 'Start small and have consistent effort', desc: 'Don\'t try to max every stat on Day 1. Pick one habit, lock it in for a week, then add another. Small wins compound into massive gains.', level: 'Lv.1' },
               { icon: <CheckCircle className="w-5 h-5 text-teal" weight="bold" />, title: 'Track everything', desc: 'What gets measured gets managed. Log your workouts, meals, sleep, and mood. You can\'t level up a stat you\'re not watching.', level: 'Lv.5' },
               { icon: <Barbell className="w-5 h-5 text-teal" weight="bold" />, title: 'Train with intention', desc: 'Every rep has a purpose. Follow a program, not a vibe. Progressive overload is the XP system. Add weight, add reps, add time under tension.', level: 'Lv.10' },
               { icon: <AppleLogo className="w-5 h-5 text-teal" weight="bold" />, title: 'Fuel like you mean it', desc: 'You can\'t out-train a bad diet. Nail your protein, stay hydrated, and eat for performance. Your nutrition stat is the multiplier for everything else.', level: 'Lv.15' },
@@ -485,7 +480,7 @@ export default function LandingPage() {
               </div>
 
               <h2 className="section-heading font-cinzel text-3xl md:text-4xl font-bold text-white mb-4" style={{ textShadow: '0 0 20px #ffd70044' }}>
-                Week by Week, Stat by Stat
+                From Novice to Legend: The Eternal Grind
               </h2>
               <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
                 This isn't a 6-week crash course. It's a progression system. You pick your tier, we give you the quests,
@@ -520,12 +515,12 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto text-center">
           <p className="section-label text-xs text-teal font-semibold mb-2 font-rajdhani" style={{ fontVariant: 'small-caps', letterSpacing: '0.15em' }}>Guild hall</p>
           <h2 className="section-heading hud-section-title text-3xl md:text-4xl font-bold mb-4">
-            You Don't Have to Grind Alone
+            You don't have to solo level
           </h2>
-          <p className="text-gray-400 mb-12 max-w-2xl mx-auto text-base leading-relaxed">
-            Join the Stat Stackers community on Discord. Share wins, get accountability, ask questions,
-            and push each other to level up. The best players never solo queue.
-          </p>
+            <p className="text-gray-400 mb-12 max-w-2xl mx-auto text-base leading-relaxed">
+              Join the Stat Stackers community on Discord. Share wins, get accountability, ask questions,
+              and push each other to level up. No need to solo queue when there is a party of like-minded individuals waiting for you.
+            </p>
 
           <div className="flex flex-col items-center gap-8">
             <div className="flex justify-center gap-8">
