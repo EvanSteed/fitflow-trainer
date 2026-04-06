@@ -15,6 +15,9 @@ export default function PaymentPage() {
   const [expiry, setExpiry] = useState('')
   const [cvc, setCvc] = useState('')
   const [nameOnCard, setNameOnCard] = useState('')
+  const [accountName, setAccountName] = useState('')
+  const [accountNumber, setAccountNumber] = useState('')
+  const [sortCode, setSortCode] = useState('')
 
   const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
   const clientData = JSON.parse(localStorage.getItem('clientData') || '{}')
@@ -26,6 +29,11 @@ export default function PaymentPage() {
     if (paymentMethod === 'card') {
       if (!cardNumber.trim() || !expiry.trim() || !cvc.trim() || !nameOnCard.trim()) {
         setError('Please fill in all card details.')
+        return
+      }
+    } else if (paymentMethod === 'direct-debit') {
+      if (!accountName.trim() || !accountNumber.trim() || !sortCode.trim()) {
+        setError('Please fill in all bank account details.')
         return
       }
     }
@@ -108,11 +116,11 @@ export default function PaymentPage() {
 
               <form onSubmit={handlePayment} className="space-y-4">
                 {/* Payment Method Selection */}
-                <div className="flex gap-2 mb-4">
+                <div className="grid grid-cols-3 gap-2 mb-4">
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
-                    className={`flex-1 py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
+                    className={`py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
                       paymentMethod === 'card'
                         ? 'bg-gold text-hud-bg'
                         : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
@@ -122,14 +130,25 @@ export default function PaymentPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod('paypal')}
-                    className={`flex-1 py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
-                      paymentMethod === 'paypal'
+                    onClick={() => setPaymentMethod('direct-debit')}
+                    className={`py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
+                      paymentMethod === 'direct-debit'
                         ? 'bg-gold text-hud-bg'
                         : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
                     }`}
                   >
-                    PayPal
+                    Direct Debit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('cash')}
+                    className={`py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
+                      paymentMethod === 'cash'
+                        ? 'bg-gold text-hud-bg'
+                        : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
+                    }`}
+                  >
+                    Cash (In-person)
                   </button>
                 </div>
 
@@ -180,9 +199,62 @@ export default function PaymentPage() {
                   </>
                 )}
 
-                {paymentMethod === 'paypal' && (
+                {paymentMethod === 'direct-debit' && (
+                  <>
+                    <div className="mb-4 p-4 bg-hud-panel border border-gold/30 rounded">
+                      <p className="text-sm text-gray-300 mb-2">
+                        <strong>Bank Transfer Details:</strong>
+                      </p>
+                      <div className="space-y-1 text-sm text-gray-400">
+                        <p>Account Name: Your Business Name</p>
+                        <p>Account Number: 12345678</p>
+                        <p>Sort Code: 12-34-56</p>
+                        <p>Reference: {clientData.fullName?.replace(/\s+/g, '') || 'Client'}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Your Account Name</label>
+                      <input
+                        type="text"
+                        value={accountName}
+                        onChange={(e) => setAccountName(e.target.value)}
+                        placeholder="John Doe"
+                        className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Account Number</label>
+                        <input
+                          type="text"
+                          value={accountNumber}
+                          onChange={(e) => setAccountNumber(e.target.value)}
+                          placeholder="12345678"
+                          className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Sort Code</label>
+                        <input
+                          type="text"
+                          value={sortCode}
+                          onChange={(e) => setSortCode(e.target.value)}
+                          placeholder="12-34-56"
+                          className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {paymentMethod === 'cash' && (
                   <div className="py-8 text-center">
-                    <p className="text-gray-400">You will be redirected to PayPal to complete your purchase.</p>
+                    <p className="text-gray-400 mb-4">
+                      Payment will be collected in-person during your first session.
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Please bring exact change or be prepared to pay the full amount.
+                    </p>
                   </div>
                 )}
 
@@ -220,7 +292,9 @@ export default function PaymentPage() {
                   ) : (
                     <>
                       <Check className="w-5 h-5" weight="bold" />
-                      Pay {selectedPackage.price}
+                      {paymentMethod === 'card' && `Pay ${selectedPackage.price}`}
+                      {paymentMethod === 'direct-debit' && `Submit Bank Details`}
+                      {paymentMethod === 'cash' && `Confirm Cash Payment`}
                     </>
                   )}
                 </button>
