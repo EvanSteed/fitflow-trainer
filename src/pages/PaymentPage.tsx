@@ -15,9 +15,7 @@ export default function PaymentPage() {
   const [expiry, setExpiry] = useState('')
   const [cvc, setCvc] = useState('')
   const [nameOnCard, setNameOnCard] = useState('')
-  const [accountName, setAccountName] = useState('')
-  const [accountNumber, setAccountNumber] = useState('')
-  const [sortCode, setSortCode] = useState('')
+
 
   const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
   const clientData = JSON.parse(localStorage.getItem('clientData') || '{}')
@@ -31,12 +29,7 @@ export default function PaymentPage() {
         setError('Please fill in all card details.')
         return
       }
-    } else if (paymentMethod === 'direct-debit') {
-      if (!accountName.trim() || !accountNumber.trim() || !sortCode.trim()) {
-        setError('Please fill in all bank account details.')
-        return
-      }
-    }
+
 
     setIsProcessing(true)
 
@@ -62,7 +55,6 @@ export default function PaymentPage() {
             </div>
             <p className="text-xs text-teal uppercase tracking-[4px] font-semibold mb-2">// Checkout</p>
             <h1 className="text-2xl font-bold text-white font-cinzel">Complete Your Purchase</h1>
-            <p className="text-sm text-gray-400 mt-1">Secure checkout powered by Stripe</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -130,14 +122,14 @@ export default function PaymentPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod('direct-debit')}
+                    onClick={() => setPaymentMethod('bank-transfer')}
                     className={`py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
-                      paymentMethod === 'direct-debit'
+                      paymentMethod === 'bank-transfer'
                         ? 'bg-gold text-hud-bg'
                         : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
                     }`}
                   >
-                    Direct Debit
+                    Bank Transfer
                   </button>
                   <button
                     type="button"
@@ -199,52 +191,21 @@ export default function PaymentPage() {
                   </>
                 )}
 
-                {paymentMethod === 'direct-debit' && (
-                  <>
-                    <div className="mb-4 p-4 bg-hud-panel border border-gold/30 rounded">
-                      <p className="text-sm text-gray-300 mb-2">
-                        <strong>Bank Transfer Details:</strong>
-                      </p>
-                      <div className="space-y-1 text-sm text-gray-400">
-                        <p>Account Name: Your Business Name</p>
-                        <p>Account Number: 12345678</p>
-                        <p>Sort Code: 12-34-56</p>
-                        <p>Reference: {clientData.fullName?.replace(/\s+/g, '') || 'Client'}</p>
-                      </div>
+                {paymentMethod === 'bank-transfer' && (
+                  <div className="mb-4 p-4 bg-hud-panel border border-gold/30 rounded">
+                    <p className="text-sm text-gray-300 mb-2">
+                      <strong>Bank Transfer Details:</strong>
+                    </p>
+                    <div className="space-y-1 text-sm text-gray-400">
+                      <p>Account Name: Evan Steed-Adams</p>
+                      <p>Account Number: 1017 4111</p>
+                      <p>BSB: 066 153</p>
+                      <p>Reference: {clientData.fullName?.replace(/\s+/g, '') || 'Client'}</p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Your Account Name</label>
-                      <input
-                        type="text"
-                        value={accountName}
-                        onChange={(e) => setAccountName(e.target.value)}
-                        placeholder="John Doe"
-                        className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Account Number</label>
-                        <input
-                          type="text"
-                          value={accountNumber}
-                          onChange={(e) => setAccountNumber(e.target.value)}
-                          placeholder="12345678"
-                          className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Sort Code</label>
-                        <input
-                          type="text"
-                          value={sortCode}
-                          onChange={(e) => setSortCode(e.target.value)}
-                          placeholder="12-34-56"
-                          className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
-                        />
-                      </div>
-                    </div>
-                  </>
+                    <p className="text-sm font-bold text-gold mt-4">
+                      Please transfer the billed amount before pressing the submit button to confirm your payment.
+                    </p>
+                  </div>
                 )}
 
                 {paymentMethod === 'cash' && (
@@ -293,12 +254,17 @@ export default function PaymentPage() {
                     <>
                       <Check className="w-5 h-5" weight="bold" />
                       {paymentMethod === 'card' && `Pay ${selectedPackage.price}`}
-                      {paymentMethod === 'direct-debit' && `Submit Bank Details`}
+                      {paymentMethod === 'bank-transfer' && `Confirm Payment`}
                       {paymentMethod === 'cash' && `Confirm Cash Payment`}
                     </>
                   )}
                 </button>
 
+                {paymentMethod === 'bank-transfer' && (
+                  <p className="text-sm text-center text-gray-400 mb-4">
+                    Please note standard processing usually takes 1-2 days.
+                  </p>
+                )}
                 <p className="text-xs text-center text-gray-600">
                   By completing this purchase, you agree to our Terms of Service and Privacy Policy.
                 </p>
