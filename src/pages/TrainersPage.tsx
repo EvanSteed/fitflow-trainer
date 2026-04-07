@@ -17,7 +17,7 @@ const trainers = [
     titleGlow: '0 0 10px #a78bfa66',
     class: 'Berserker',
     level: 50,
-    role: 'Lead Trainer',
+    role: 'Trainer',
     avatar: null,
     stats: {
       str: 92,
@@ -38,7 +38,7 @@ const trainers = [
     titleGlow: '0 0 10px #a78bfa66',
     class: 'High Priest',
     level: 45,
-    role: 'Chief Advisor',
+    role: 'Trainer',
     avatar: null,
     stats: {
       str: 75,

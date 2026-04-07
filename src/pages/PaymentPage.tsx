@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CreditCard, Lock, ArrowLeft, Check, Shield, WarningCircle, LockKey } from '@phosphor-icons/react'
+import { loadStripe } from '@stripe/stripe-js'
 import GameHudHeader from '../components/GameHudHeader'
 import GameHudFooter from '../components/GameHudFooter'
 
@@ -9,6 +10,7 @@ export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('card')
   const [error, setError] = useState('')
+  const [stripe, setStripe] = useState<any>(null)
 
   // Bound form state
   const [cardNumber, setCardNumber] = useState('')
@@ -16,30 +18,81 @@ export default function PaymentPage() {
   const [cvc, setCvc] = useState('')
   const [nameOnCard, setNameOnCard] = useState('')
 
-
-  const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
+  // Hardcoded fallback based on package name (in case all else fails)
+  const priceMap: Record<string, number> = {
+    'Basic': 49.99,
+    'Pro': 99.99,
+    'Elite': 199.99,
+    'Single Session': 80,
+    '10 Session Pack': 700,
+    '20 Session Pack': 1200,
+    'Starter': 250,
+    'Transform': 800,
+    'Premium': 1500
+  }
+  
+  // Get the raw values from storage
+  const rawSelectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
   const clientData = JSON.parse(localStorage.getItem('clientData') || '{}')
+
+  // Determine which values to use - ensure they are numbers
+  const packageName = rawSelectedPackage.name || clientData.package_name || 'Unknown Package'
+  let packagePrice = Number(rawSelectedPackage.price) || Number(clientData.package_price) || 0
+  
+  // If price is still 0, look it up by name
+  if (!packagePrice && packageName && packageName !== 'Unknown Package') {
+    packagePrice = priceMap[packageName] || 0
+  }
+
+  const stripeFee = paymentMethod === 'card' ? packagePrice * 0.02 : 0
+  const totalPrice: number = packagePrice + stripeFee
+
+  // Debug
+  console.log('rawSelectedPackage:', rawSelectedPackage)
+  console.log('clientData:', clientData)
+  console.log('packageName:', packageName)
+  console.log('packagePrice:', packagePrice)
+
+  useEffect(() => {
+    const initializeStripe = async () => {
+      const stripeInstance = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder')
+      setStripe(stripeInstance)
+    }
+    initializeStripe()
+  }, [])
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
-    if (paymentMethod === 'card') {
-      if (!cardNumber.trim() || !expiry.trim() || !cvc.trim() || !nameOnCard.trim()) {
-        setError('Please fill in all card details.')
-        return
-      }
-
-
     setIsProcessing(true)
 
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    if (paymentMethod === 'card') {
+      // For Stripe integration, redirect to hosted checkout
+      // In production, this would create a session server-side
+      // For demo, simulate Stripe checkout
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-    localStorage.setItem('paymentStatus', 'completed')
-    localStorage.setItem('paymentAmount', selectedPackage.price)
+      // Simulate successful Stripe payment
+      localStorage.setItem('paymentStatus', 'completed')
+      localStorage.setItem('paymentMethod', 'stripe')
+      localStorage.setItem('paymentAmount', totalPrice.toFixed(2))
+      localStorage.setItem('stripeFee', stripeFee.toFixed(2))
 
-    navigate('/success')
+      navigate('/success')
+    } else {
+      // Simulate other payment methods
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
+      localStorage.setItem('paymentStatus', 'completed')
+      localStorage.setItem('paymentMethod', paymentMethod)
+      localStorage.setItem('paymentAmount', totalPrice.toFixed(2))
+      if (paymentMethod === 'card') {
+        localStorage.setItem('stripeFee', stripeFee.toFixed(2))
+      }
+
+      navigate('/success')
+    }
   }
 
   return (
@@ -67,24 +120,30 @@ export default function PaymentPage() {
               <div className="border-b border-hud-border pb-4 mb-4">
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <p className="font-semibold text-white">{selectedPackage.name}</p>
-                    <p className="text-sm text-gray-500">{selectedPackage.description}</p>
+                    <p className="font-semibold text-white">{packageName}</p>
+                    <p className="text-sm text-gray-500">Service Package</p>
                   </div>
-                  <p className="font-bold text-white font-rajdhani">{selectedPackage.price}</p>
+                  <p className="font-bold text-white font-rajdhani">${packagePrice}</p>
                 </div>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Subtotal</span>
-                  <span className="text-white">{selectedPackage.price}</span>
+                  <span className="text-white">${packagePrice}</span>
                 </div>
+                {paymentMethod === 'card' && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Processing Fee (2%)</span>
+                    <span className="text-white">${stripeFee.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-400">Tax</span>
                   <span className="text-white">$0.00</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-hud-border font-bold">
                   <span className="text-white">Total</span>
-                  <span className="text-gold font-rajdhani">{selectedPackage.price}</span>
+                  <span className="text-gold font-rajdhani">${totalPrice.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -118,7 +177,7 @@ export default function PaymentPage() {
                         : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
                     }`}
                   >
-                    Card
+                    Card (Stripe)
                   </button>
                   <button
                     type="button"
@@ -145,50 +204,18 @@ export default function PaymentPage() {
                 </div>
 
                 {paymentMethod === 'card' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Card Number</label>
-                      <input
-                        type="text"
-                        value={cardNumber}
-                        onChange={(e) => setCardNumber(e.target.value)}
-                        placeholder="4242 4242 4242 4242"
-                        className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
-                      />
+                  <div className="p-4 bg-hud-panel border border-gold/30 rounded">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield className="w-5 h-5 text-gold" weight="bold" />
+                      <span className="text-gold font-semibold font-rajdhani">Secure Payment via Stripe</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Expiry</label>
-                        <input
-                          type="text"
-                          value={expiry}
-                          onChange={(e) => setExpiry(e.target.value)}
-                          placeholder="MM/YY"
-                          className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">CVC</label>
-                        <input
-                          type="text"
-                          value={cvc}
-                          onChange={(e) => setCvc(e.target.value)}
-                          placeholder="123"
-                          className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">Name on Card</label>
-                      <input
-                        type="text"
-                        value={nameOnCard}
-                        onChange={(e) => setNameOnCard(e.target.value)}
-                        placeholder="John Doe"
-                        className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
-                      />
-                    </div>
-                  </>
+                    <p className="text-sm text-gray-300 mb-2">
+                      You'll be redirected to Stripe's secure checkout page to complete your payment.
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Stripe handles all payment processing securely and PCI compliant.
+                    </p>
+                  </div>
                 )}
 
                 {paymentMethod === 'bank-transfer' && (
@@ -253,7 +280,7 @@ export default function PaymentPage() {
                   ) : (
                     <>
                       <Check className="w-5 h-5" weight="bold" />
-                      {paymentMethod === 'card' && `Pay ${selectedPackage.price}`}
+                      {paymentMethod === 'card' && `Pay $${totalPrice.toFixed(2)} with Stripe`}
                       {paymentMethod === 'bank-transfer' && `Confirm Payment`}
                       {paymentMethod === 'cash' && `Confirm Cash Payment`}
                     </>

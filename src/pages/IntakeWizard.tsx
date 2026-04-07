@@ -13,11 +13,16 @@ interface ClientData {
   gender: string
   goals: string[]
   experienceLevel: number
+  fitnessCheck: string[]
+  weightRange: string
+  preferLowImpact: boolean
   injuries: string
   equipmentAccess: string[]
   daysPerWeek: number
+  sessionLength: number
   location: string
   deliveryMethod: string
+  motivations: string[]
 }
 
 interface FormErrors {
@@ -39,6 +44,34 @@ const goals = [
   'Post-Rehab'
 ]
 
+const fitnessChecks = [
+  'Can do 10+ pushups',
+  'Can do 5+ pull-ups',
+  'Can run 3km without stopping',
+  'Never exercised before',
+  'Can do 10+ squats',
+  'Can hold plank for 60+ seconds'
+]
+
+const weightRanges = [
+  'Under 60kg',
+  '60-80kg',
+  '80-100kg',
+  '100-120kg',
+  'Over 120kg',
+  'Prefer not to say'
+]
+
+const motivations = [
+  'Health concerns',
+  'Look better',
+  'Performance goals',
+  'Life event (wedding, reunion, etc.)',
+  'Just want to feel stronger',
+  'Doctor recommendation',
+  'New year motivation'
+]
+
 const equipment = [
   'Full Gym Access',
   'Dumbbells',
@@ -52,8 +85,15 @@ const equipment = [
 
 const deliveryMethods = [
   { id: 'email', label: 'Email (PDF)', icon: EnvelopeSimple, desc: 'Receive your program as a PDF attachment' },
-  { id: 'app', label: 'Discord', icon: Monitor, desc: 'Programs and communication delivered through our Discord server' },
+  { id: 'discord', label: 'Discord', icon: Monitor, desc: 'Programs and communication delivered through our Discord server' },
   { id: 'sheets', label: 'Google Sheets', icon: CalendarBlank, desc: 'Interactive spreadsheet with videos' }
+]
+
+const sessionLengths = [
+  { value: 30, label: '30 min' },
+  { value: 45, label: '45 min' },
+  { value: 60, label: '60 min' },
+  { value: 90, label: '90 min' }
 ]
 
 export default function IntakeWizard() {
@@ -69,17 +109,32 @@ export default function IntakeWizard() {
     gender: '',
     goals: [],
     experienceLevel: 3,
+    fitnessCheck: [],
+    weightRange: '',
+    preferLowImpact: false,
     injuries: '',
     equipmentAccess: [],
     daysPerWeek: 3,
+    sessionLength: 60,
     location: '',
-    deliveryMethod: 'email'
+    deliveryMethod: 'email',
+    motivations: []
   })
 
   useEffect(() => {
     const saved = localStorage.getItem('intakeData')
     if (saved) {
-      setData(JSON.parse(saved))
+      const parsed = JSON.parse(saved)
+      // Merge saved data with new fields for backwards compatibility
+      setData(prev => ({
+        ...prev,
+        ...parsed,
+        fitnessCheck: parsed.fitnessCheck || [],
+        weightRange: parsed.weightRange || '',
+        preferLowImpact: parsed.preferLowImpact || false,
+        sessionLength: parsed.sessionLength || 60,
+        motivations: parsed.motivations || []
+      }))
     }
   }, [])
 
@@ -135,33 +190,37 @@ export default function IntakeWizard() {
     setIsSubmitting(true)
     setErrors({})
 
-      const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
+    const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
 
-      // Clean and parse the price to ensure it's a valid integer
-      const cleanPrice = selectedPackage.price
-        ? Math.round(parseFloat(selectedPackage.price.toString().replace(/[^0-9.-]/g, '')))
-        : null
+    const cleanPrice = selectedPackage.price
+      ? Math.round(parseFloat(selectedPackage.price.toString().replace(/[^0-9.-]/g, '')))
+      : null
 
-      try {
-        const { data: client, error } = await supabase
-          .from('clients')
-          .insert({
-            full_name: data.fullName,
-            email: data.email,
-            phone: data.phone,
-            age: data.age || null,
-            gender: data.gender || null,
-            goals: data.goals,
-            experience_level: data.experienceLevel,
-            injuries: data.injuries || null,
-            equipment_access: data.equipmentAccess,
-            days_per_week: data.daysPerWeek,
-            location: data.location || null,
-            delivery_method: data.deliveryMethod,
-            package_name: selectedPackage.name || null,
-            package_price: cleanPrice,
-            status: 'pending'
-          })
+    try {
+      const { data: client, error } = await supabase
+        .from('clients')
+        .insert({
+          full_name: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          age: data.age || null,
+          gender: data.gender || null,
+          goals: data.goals,
+          experience_level: data.experienceLevel,
+          fitness_check: data.fitnessCheck,
+          weight_range: data.weightRange || null,
+          prefer_low_impact: data.preferLowImpact,
+          injuries: data.injuries || null,
+          equipment_access: data.equipmentAccess,
+          days_per_week: data.daysPerWeek,
+          session_length: data.sessionLength,
+          location: data.location || null,
+          delivery_method: data.deliveryMethod,
+          motivations: data.motivations,
+          package_name: selectedPackage.name || null,
+          package_price: cleanPrice,
+          status: 'pending'
+        })
         .select()
         .single()
 
@@ -171,7 +230,11 @@ export default function IntakeWizard() {
         return
       }
 
-      localStorage.setItem('clientData', JSON.stringify(data))
+      localStorage.setItem('clientData', JSON.stringify({
+        ...data,
+        package_name: selectedPackage.name || null,
+        package_price: cleanPrice
+      }))
       localStorage.setItem('clientId', client?.id || '')
       navigate('/payment')
     } catch (err) {
@@ -189,8 +252,10 @@ export default function IntakeWizard() {
       case 2:
         return true
       case 3:
-        return data.daysPerWeek > 0
+        return data.equipmentAccess.length > 0
       case 4:
+        return data.motivations.length > 0
+      case 5:
         return data.deliveryMethod
       default:
         return true
@@ -209,7 +274,7 @@ export default function IntakeWizard() {
               type="text"
               value={data.fullName}
               onChange={(e) => updateData({ fullName: e.target.value })}
-              className={`w-full px-4 py-3 rounded bg-hud-bg border ${errors.fullName ? 'border-red-500' : 'border-hud-border'} text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani`}
+              className={`w-full px-4 py-3 rounded bg-hud-bg border ${errors.fullName ? 'border-red-500' : 'border-hud-border'} text-white placeholder-gray-600 outline-none font-rajdhani`}
               placeholder="John Doe"
             />
             {errors.fullName && (
@@ -225,7 +290,7 @@ export default function IntakeWizard() {
               type="email"
               value={data.email}
               onChange={(e) => updateData({ email: e.target.value })}
-              className={`w-full px-4 py-3 rounded bg-hud-bg border ${errors.email ? 'border-red-500' : 'border-hud-border'} text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani`}
+              className={`w-full px-4 py-3 rounded bg-hud-bg border ${errors.email ? 'border-red-500' : 'border-hud-border'} text-white placeholder-gray-600 outline-none font-rajdhani`}
               placeholder="john@example.com"
             />
             {errors.email && (
@@ -241,7 +306,7 @@ export default function IntakeWizard() {
               type="tel"
               value={data.phone}
               onChange={(e) => updateData({ phone: e.target.value })}
-              className={`w-full px-4 py-3 rounded bg-hud-bg border ${errors.phone ? 'border-red-500' : 'border-hud-border'} text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani`}
+              className={`w-full px-4 py-3 rounded bg-hud-bg border ${errors.phone ? 'border-red-500' : 'border-hud-border'} text-white placeholder-gray-600 outline-none font-rajdhani`}
               placeholder="+1 (555) 000-0000"
             />
             {errors.phone && (
@@ -258,7 +323,7 @@ export default function IntakeWizard() {
                 type="number"
                 value={data.age}
                 onChange={(e) => updateData({ age: e.target.value })}
-                className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 outline-none font-rajdhani"
                 placeholder="25"
               />
             </div>
@@ -267,7 +332,7 @@ export default function IntakeWizard() {
               <select
                 value={data.gender}
                 onChange={(e) => updateData({ gender: e.target.value })}
-                className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+                className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white outline-none font-rajdhani"
               >
                 <option value="" className="bg-hud-bg">Select...</option>
                 <option value="male" className="bg-hud-bg">Male</option>
@@ -295,7 +360,7 @@ export default function IntakeWizard() {
                     : [...data.goals, goal]
                   updateData({ goals: newGoals })
                 }}
-                className={`p-4 rounded border-2 text-left transition-all font-rajdhani ${
+                className={`p-4 rounded border-2 text-left font-rajdhani ${
                   data.goals.includes(goal)
                     ? 'border-gold bg-gold/10 text-gold'
                     : `border-hud-border hover:border-hud-border-light text-gray-400 hover:text-gray-200 ${errors.goals ? 'border-red-500/50' : ''}`
@@ -318,46 +383,47 @@ export default function IntakeWizard() {
       )
     },
     {
-      title: 'Your fitness background',
-      subtitle: 'Help us understand your experience level',
+      title: 'Quick fitness check',
+      subtitle: 'Select all that apply to you',
       content: (
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3 font-rajdhani">
-              Experience Level: <span className="text-gold font-bold">
-                {data.experienceLevel === 1 && 'Beginner'}
-                {data.experienceLevel === 2 && 'Intermediate'}
-                {data.experienceLevel === 3 && 'Advanced'}
-                {data.experienceLevel === 4 && 'Athlete'}
-                {data.experienceLevel === 5 && 'Elite'}
-              </span>
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={data.experienceLevel}
-              onChange={(e) => updateData({ experienceLevel: parseInt(e.target.value) })}
-              className="w-full h-2 bg-hud-panel rounded-lg appearance-none cursor-pointer accent-gold"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1.5 font-rajdhani">
-              <span>Beginner</span>
-              <span>Intermediate</span>
-              <span>Advanced</span>
-              <span>Athlete</span>
-              <span>Elite</span>
-            </div>
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 gap-3">
+            {fitnessChecks.map((check) => (
+              <button
+                key={check}
+                onClick={() => {
+                  const newChecks = data.fitnessCheck.includes(check)
+                    ? data.fitnessCheck.filter(c => c !== check)
+                    : [...data.fitnessCheck, check]
+                  updateData({ fitnessCheck: newChecks })
+                }}
+                className={`p-3 rounded border-2 text-left font-rajdhani ${
+                  data.fitnessCheck.includes(check)
+                    ? 'border-gold bg-gold/10 text-gold'
+                    : 'border-hud-border hover:border-hud-border-light text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{check}</span>
+                  {data.fitnessCheck.includes(check) && <Check className="w-4 h-4 text-gold" weight="bold" />}
+                </div>
+              </button>
+            ))}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">
-              Any injuries or health conditions we should know about?
-            </label>
-            <textarea
-              value={data.injuries}
-              onChange={(e) => updateData({ injuries: e.target.value })}
-              className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all h-24 resize-none font-rajdhani"
-              placeholder="e.g., Knee pain, lower back issues, shoulder injury..."
-            />
+          <div className="pt-4 border-t border-hud-border">
+            <button
+              onClick={() => updateData({ preferLowImpact: !data.preferLowImpact })}
+              className={`p-3 rounded border-2 text-left font-rajdhani w-full ${
+                data.preferLowImpact
+                  ? 'border-gold bg-gold/10 text-gold'
+                  : 'border-hud-border hover:border-hud-border-light text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm">I prefer low-impact exercises</span>
+                {data.preferLowImpact && <Check className="w-4 h-4 text-gold" weight="bold" />}
+              </div>
+            </button>
           </div>
         </div>
       )
@@ -368,7 +434,7 @@ export default function IntakeWizard() {
       content: (
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3 font-rajdhani">Equipment Access</label>
+            <label className="block text-sm font-medium text-gray-300 mb-3 font-rajdhani">Equipment Access *</label>
             <div className="grid grid-cols-2 gap-3">
               {equipment.map((item) => (
                 <button
@@ -379,7 +445,7 @@ export default function IntakeWizard() {
                       : [...data.equipmentAccess, item]
                     updateData({ equipmentAccess: newEquipment })
                   }}
-                  className={`p-3 rounded border-2 text-sm text-left transition-all font-rajdhani ${
+                  className={`p-3 rounded border-2 text-sm text-left font-rajdhani ${
                     data.equipmentAccess.includes(item)
                       ? 'border-gold bg-gold/10 text-gold'
                       : 'border-hud-border hover:border-hud-border-light text-gray-400 hover:text-gray-200'
@@ -411,6 +477,24 @@ export default function IntakeWizard() {
             </div>
           </div>
           <div>
+            <label className="block text-sm font-medium text-gray-300 mb-3 font-rajdhani">Preferred session length</label>
+            <div className="grid grid-cols-4 gap-2">
+              {sessionLengths.map((length) => (
+                <button
+                  key={length.value}
+                  onClick={() => updateData({ sessionLength: length.value })}
+                  className={`p-3 rounded border-2 text-center font-rajdhani ${
+                    data.sessionLength === length.value
+                      ? 'border-gold bg-gold/10 text-gold'
+                      : 'border-hud-border hover:border-hud-border-light text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  <span className="text-sm font-medium">{length.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5 font-rajdhani">
               Preferred training location (for in-person)
             </label>
@@ -418,9 +502,41 @@ export default function IntakeWizard() {
               type="text"
               value={data.location}
               onChange={(e) => updateData({ location: e.target.value })}
-              className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 focus:border-gold focus:ring-1 focus:ring-gold/30 outline-none transition-all font-rajdhani"
+              className="w-full px-4 py-3 rounded bg-hud-bg border border-hud-border text-white placeholder-gray-600 outline-none font-rajdhani"
               placeholder="e.g., Downtown Gym, Home gym, etc."
             />
+          </div>
+        </div>
+      )
+    },
+    {
+      title: 'Why are you starting now?',
+      subtitle: 'Select your main motivations',
+      content: (
+        <div className="space-y-4">
+          <p className="text-sm text-gray-400 mb-4">This helps us understand what's driving your fitness journey</p>
+          <div className="grid grid-cols-1 gap-3">
+            {motivations.map((motivation) => (
+              <button
+                key={motivation}
+                onClick={() => {
+                  const newMotivations = data.motivations.includes(motivation)
+                    ? data.motivations.filter(m => m !== motivation)
+                    : [...data.motivations, motivation]
+                  updateData({ motivations: newMotivations })
+                }}
+                className={`p-3 rounded border-2 text-left font-rajdhani ${
+                  data.motivations.includes(motivation)
+                    ? 'border-gold bg-gold/10 text-gold'
+                    : 'border-hud-border hover:border-hud-border-light text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{motivation}</span>
+                  {data.motivations.includes(motivation) && <Check className="w-4 h-4 text-gold" weight="bold" />}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       )
@@ -434,7 +550,7 @@ export default function IntakeWizard() {
             <button
               key={method.id}
               onClick={() => updateData({ deliveryMethod: method.id })}
-              className={`w-full p-4 rounded border-2 text-left transition-all flex items-center gap-4 font-rajdhani ${
+              className={`w-full p-4 rounded border-2 text-left flex items-center gap-4 font-rajdhani ${
                 data.deliveryMethod === method.id
                   ? 'border-gold bg-gold/10'
                   : 'border-hud-border hover:border-hud-border-light'
@@ -487,7 +603,7 @@ export default function IntakeWizard() {
               {steps.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     idx < currentStep
                       ? 'bg-gold text-hud-bg'
                       : idx === currentStep
@@ -508,7 +624,7 @@ export default function IntakeWizard() {
           </div>
 
           {/* Form Card */}
-          <div className="hud-card p-6 md:p-8 relative">
+          <div className="hud-card p-6 md:p-8 relative" style={{ transition: 'none' }}>
             <div className="corner-decor-tl" />
             <div className="corner-decor-tr" />
 
@@ -532,7 +648,7 @@ export default function IntakeWizard() {
               <button
                 onClick={handleBack}
                 disabled={currentStep === 0}
-                className={`flex items-center gap-2 px-6 py-3 rounded font-medium transition-all font-rajdhani ${
+                className={`flex items-center gap-2 px-6 py-3 rounded font-medium font-rajdhani ${
                   currentStep === 0
                     ? 'text-gray-600 cursor-not-allowed'
                     : 'text-gray-400 hover:text-gold hover:bg-hud-panel'

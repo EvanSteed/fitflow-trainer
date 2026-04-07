@@ -166,7 +166,6 @@ body::after {
 }
 
 .hud-btn:active {
-  transform: scale(0.98);
 }
 
 .hud-btn:hover::before {
@@ -205,7 +204,6 @@ body::after {
 }
 
 .hud-btn-gold:active {
-  transform: translateY(0) scale(0.98);
 }
 
 .hud-btn-gold::before {
@@ -255,7 +253,6 @@ body::after {
 }
 
 .hud-card:active {
-  transform: scale(0.99);
 }
 
 .hud-card-featured {
