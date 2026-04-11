@@ -5,7 +5,6 @@ import IntakeWizard from './pages/IntakeWizard'
 import AdminDashboard from './pages/AdminDashboard'
 import PaymentPage from './pages/PaymentPage'
 import SuccessPage from './pages/SuccessPage'
-import ServicePage from './pages/ServicePage'
 import TrainersPage from './pages/TrainersPage'
 import WhatWeDoPage from './pages/WhatWeDoPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -22,7 +21,6 @@ export default function App() {
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/success" element={<SuccessPage />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/service/:serviceId" element={<ServicePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>

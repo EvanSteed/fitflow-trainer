@@ -20,15 +20,14 @@ export default function PaymentPage() {
 
   // Hardcoded fallback based on package name (in case all else fails)
   const priceMap: Record<string, number> = {
-    'Basic': 49.99,
-    'Pro': 99.99,
-    'Elite': 199.99,
+    'Core Coaching': 100,
+    'Elite Coaching': 240,
     'Single Session': 80,
     '10 Session Pack': 700,
     '20 Session Pack': 1200,
     'Starter': 250,
     'Transform': 800,
-    'Premium': 1500
+    'Premium (Trainer)': 1500
   }
   
   // Get the raw values from storage

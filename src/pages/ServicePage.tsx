@@ -17,6 +17,7 @@ interface ServicePackage {
   description: string
   features: string[]
   highlighted?: boolean
+  limited?: boolean
 }
 
 const servicesData: Record<string, {
@@ -28,55 +29,43 @@ const servicesData: Record<string, {
 }> = {
   'online-coaching': {
     title: 'Online Coaching',
-    subtitle: 'Train Anywhere, Anytime',
-    description: 'Get personalized training programs delivered directly to your phone with weekly check-ins and unlimited support. Perfect for those who want expert guidance without the constraints of location or gym hours.',
+    subtitle: 'Your Personalised Programming',
+    description: 'Fully personalised training programs built around your body, your goals, and your lifestyle. Every tier includes one-on-one coaching—choose the level of access that matches your needs.',
     icon: <Lightning className="w-8 h-8 text-gold" weight="bold" />,
     packages: [
       {
-        id: 'online-basic',
-        name: 'Basic',
-        price: 49.99,
-        period: '/month',
-        description: 'Perfect for those just starting their fitness journey',
-        features: [
-          'Weekly personalized workout programs',
-          'Monthly progress check-in',
-          'Exercise video library access',
-          'Discord server access'
-        ]
-      },
-      {
-        id: 'online-pro',
-        name: 'Pro',
+        id: 'online-standard',
+        name: 'Standard',
         price: 99.99,
         period: '/month',
-        description: 'Most popular choice for serious results',
+        description: 'Structured coaching with consistent guidance and accountability',
         features: [
-          'Weekly personalized workout programs',
-          'Weekly video form checks (2 videos)',
-          'Nutrition guidance & meal templates',
-          'WhatsApp support during business hours',
-          'Monthly progress report',
-          'Discord server access'
-        ],
-        highlighted: true
+          'Fully personalised training program',
+          'Weekly check-ins (fortnight)',
+          '24-48 hour response time',
+          'Batched form checks (2/week)',
+          'Habit tracking & accountability',
+          'Program adjustments as needed'
+        ]
       },
       {
-        id: 'online-elite',
-        name: 'Elite',
+        id: 'online-premium',
+        name: 'Premium',
         price: 199.99,
         period: '/month',
-        description: 'Complete transformation package',
+        description: 'Close-proximity coaching with faster feedback and deeper support',
+        limited: true,
         features: [
-          'Bi-weekly personalized workout programs',
-          'Unlimited video form checks',
-          'Detailed nutrition planning',
-          '24/7 WhatsApp support',
-          'Weekly progress calls',
-          'Custom exercise library',
-          'Priority scheduling',
-          'Discord server access'
-        ]
+          'Fully personalised training program',
+          '2-3x weekly check-ins',
+          'Same-day response priority',
+          'Unlimited form checks',
+          'Voice & video feedback',
+          'Priority direct channel access',
+          'Recovery & lifestyle coaching',
+          'Program adjustments on-demand'
+        ],
+        highlighted: true
       }
     ]
   },
@@ -315,7 +304,7 @@ export default function ServicePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 stagger-enter">
+          <div className="grid md:grid-cols-2 gap-8 stagger-enter max-w-4xl mx-auto">
             {service.packages.map((pkg, idx) => (
               <div
                 key={pkg.id}
@@ -337,7 +326,12 @@ export default function ServicePage() {
 
                 {pkg.highlighted && (
                   <div className="bg-gold text-hud-bg text-xs font-bold px-3 py-2 text-center uppercase tracking-wider font-rajdhani">
-                    MOST POPULAR
+                    Recommended
+                  </div>
+                )}
+                {pkg.limited && (
+                  <div className="bg-hud-panel border border-gold/30 text-gold text-[10px] font-bold px-3 py-1.5 text-center uppercase tracking-wider font-rajdhani">
+                    Limited Spots Available
                   </div>
                 )}
                 <div className="p-8 flex flex-col flex-grow">
@@ -368,10 +362,10 @@ export default function ServicePage() {
                   <div className="mb-5">
                     <div className="flex justify-between text-[9px] text-gray-500 uppercase tracking-wider mb-1">
                       <span>Value Rating</span>
-                      <span>{idx === 0 ? '40%' : idx === 1 ? '75%' : '100%'}</span>
+                      <span>{idx === 0 ? '60%' : '100%'}</span>
                     </div>
                     <div className="xp-bar-track">
-                      <div className="xp-bar-fill" data-width={idx === 0 ? '40%' : idx === 1 ? '75%' : '100%'} style={{ width: '0%' }} />
+                      <div className="xp-bar-fill" data-width={idx === 0 ? '60%' : '100%'} style={{ width: '0%' }} />
                     </div>
                   </div>
 
