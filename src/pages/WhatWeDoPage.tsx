@@ -88,7 +88,7 @@ export default function WhatWeDoPage() {
       stat: 'STR',
       title: 'Online Programming',
       subtitle: 'Build Your Training Foundation',
-      description: 'Every great character starts with a solid build. Your training program is the backbone of your fitness journey -- designed around your goals, your schedule, and your experience level.',
+      description: 'Every great character starts with a solid build. Your training program is the backbone of your fitness journey — designed around your goals, your schedule, and your experience level.',
       details: [
         'Personalized workout programs updated weekly or bi-weekly',
         'Progressive overload built into every session so you keep leveling up',
@@ -107,7 +107,7 @@ export default function WhatWeDoPage() {
       details: [
         'Macro targets and calorie guidance tailored to your goal',
         'Meal templates and prep strategies that fit your lifestyle',
-        'Flexible dieting approach -- no foods are off limits',
+        'Flexible dieting approach — no foods are off limits',
         'Nutrition adjustments based on your check-in progress',
         'Supplement recommendations if needed (no BS, just what works)',
       ],
@@ -148,7 +148,7 @@ export default function WhatWeDoPage() {
       stat: 'DISC',
       title: 'Habit Building Systems',
       subtitle: 'Stack Daily XP',
-      description: 'The boring stuff that separates Level 1 from Level 50. Sleep, recovery, daily routines -- progress compounds week by week. We help you build the habits that turn effort into results.',
+      description: 'The boring stuff that separates Level 1 from Level 50. Sleep, recovery, daily routines — progress compounds week by week. We help you build the habits that turn effort into results.',
       details: [
         'Sleep optimization strategies for better recovery',
         'Daily routine building and consistency tracking',
@@ -169,7 +169,7 @@ export default function WhatWeDoPage() {
     {
       icon: <TrendUp className="w-6 h-6 text-teal" weight="bold" />,
       title: 'Data-Driven Adjustments',
-      desc: 'We don\'t guess. Your program evolves based on your actual progress -- not a generic 12-week cycle that ignores your reality.',
+      desc: 'We don\'t guess. Your program evolves based on your actual progress — not a generic 12-week cycle that ignores your reality.',
     },
     {
       icon: <Users className="w-6 h-6 text-teal" weight="bold" />,
@@ -179,7 +179,7 @@ export default function WhatWeDoPage() {
     {
       icon: <Trophy className="w-6 h-6 text-teal" weight="bold" />,
       title: 'Train on Your Schedule',
-      desc: 'No locked-in session times. Train when it works for you -- morning, night, home gym, commercial gym, hotel room. Your quest, your timing.',
+      desc: 'No locked-in session times. Train when it works for you — morning, night, home gym, commercial gym, hotel room. Your quest, your timing.',
     },
   ]
 
@@ -207,7 +207,7 @@ export default function WhatWeDoPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Online coaching with Stat Stackers isn't just a workout plan. It's a fully integrated system designed to level up every stat that matters -- training, nutrition, accountability, technique, and daily habits.
+            Online coaching with Stat Stackers isn't just a workout plan. It's a fully integrated system designed to level up every stat that matters — training, nutrition, accountability, technique, and daily habits.
           </p>
 
           <div className="flex justify-center gap-8 mb-6">
@@ -374,7 +374,7 @@ export default function WhatWeDoPage() {
               { step: '01', title: 'Choose Your Plan', desc: 'Pick the tier that matches your goals and budget. Every plan starts with a free consultation to assess your current level and set your objectives.' },
               { step: '02', title: 'Complete Your Intake', desc: 'Fill out a detailed questionnaire about your training history, goals, injuries, schedule, and nutrition. This is how we build your starting stats.' },
               { step: '03', title: 'Get Your Custom Program', desc: 'Within 48 hours, you receive your personalized training program and nutrition guidelines through Discord. Every detail is built around you.' },
-              { step: '04', title: 'Train & Track', desc: 'Follow your program, send form check videos, and communicate with your coach -- all through Discord. Everything stays in one place so the system stays optimized.' },
+              { step: '04', title: 'Train & Track', desc: 'Follow your program, send form check videos, and communicate with your coach — all through Discord. Everything stays in one place so the system stays optimized.' },
               { step: '05', title: 'Check In & Level Up', desc: 'At your scheduled check-in, we review your progress, adjust your program, and set new targets. Rinse and repeat. Week by week, stat by stat.' },
             ].map((item, i) => (
               <div key={i} className="timeline-item hud-card flex items-start gap-5 p-6 relative" style={{ opacity: 0 }}>

@@ -592,7 +592,7 @@ export default function IntakeWizard() {
             <h1 className="text-2xl font-bold text-white font-cinzel">Character Setup</h1>
             {selectedPackage.name && (
               <p className="text-sm text-gray-400 mt-1">
-                {selectedPackage.name} -- {selectedPackage.price}
+                {selectedPackage.name} — {selectedPackage.price}
               </p>
             )}
           </div>

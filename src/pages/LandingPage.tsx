@@ -366,7 +366,7 @@ export default function LandingPage() {
               {
                 icon: <Barbell className="w-7 h-7 text-gold" weight="bold" />,
                 title: 'Workout Programming',
-                desc: 'Customized training for any goal -- strength, hypertrophy, endurance, or general fitness. Progressive overload built into every session.',
+                desc: 'Customized training for any goal — strength, hypertrophy, endurance, sport specific, or general fitness.',
                 xp: '+Fitness',
                 stat: 'STR',
               },
@@ -576,9 +576,9 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: <MapPin className="w-6 h-6 text-gold" weight="bold" />, label: 'Location', value: 'Downtown Fitness Center', sub: '123 Main Street' },
-              { icon: <Clock className="w-6 h-6 text-gold" weight="bold" />, label: 'Hours', value: 'Mon - Sat: 6AM - 8PM', sub: 'Sunday: By appointment' },
-              { icon: <EnvelopeSimple className="w-6 h-6 text-gold" weight="bold" />, label: 'Contact', value: 'hello@statstackers.com', sub: '+1 (555) 123-4567' },
+              { icon: <MapPin className="w-6 h-6 text-gold" weight="bold" />, label: 'Location', value: 'Online + Plus Fitness Melville', sub: '380 Canning Hwy, Bicton' },
+              { icon: <Clock className="w-6 h-6 text-gold" weight="bold" />, label: 'Hours', value: 'Contactable 6am - 8pm every day', sub: '' },
+              { icon: <EnvelopeSimple className="w-6 h-6 text-gold" weight="bold" />, label: 'Contact', value: 'hello@statstackers.com', sub: 'Join the discord and message a Trainer' },
             ].map((info, i) => (
               <div key={i} className="reveal-card hud-card p-6 text-center relative" style={{ opacity: 0 }}>
                 <div className="corner-decor-tl" />
