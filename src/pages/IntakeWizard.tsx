@@ -197,32 +197,32 @@ export default function IntakeWizard() {
       : null
 
     try {
-      const { data: client, error } = await supabase
-        .from('clients')
-        .insert({
-          full_name: data.fullName,
-          email: data.email,
-          phone: data.phone,
-          age: data.age || null,
-          gender: data.gender || null,
-          goals: data.goals,
-          experience_level: data.experienceLevel,
-          fitness_check: data.fitnessCheck,
-          weight_range: data.weightRange || null,
-          prefer_low_impact: data.preferLowImpact,
-          injuries: data.injuries || null,
-          equipment_access: data.equipmentAccess,
-          days_per_week: data.daysPerWeek,
-          session_length: data.sessionLength,
-          location: data.location || null,
-          delivery_method: data.deliveryMethod,
-          motivations: data.motivations,
-          package_name: selectedPackage.name || null,
-          package_price: cleanPrice,
-          status: 'pending'
-        })
-        .select()
-        .single()
+       const { data: client, error } = await supabase
+         .from('clients')
+         .insert({
+           full_name: data.fullName,
+           email: data.email,
+           phone: data.phone,
+           age: data.age ? parseInt(data.age) || null : null,
+           gender: data.gender || null,
+           goals: data.goals,
+           experience_level: data.experienceLevel,
+           fitness_check: Array.isArray(data.fitnessCheck) ? data.fitnessCheck.join(', ') : data.fitnessCheck,
+           weight_range: data.weightRange || null,
+           prefer_low_impact: data.preferLowImpact,
+           injuries: data.injuries || null,
+           equipment_access: data.equipmentAccess,
+           days_per_week: data.daysPerWeek,
+           session_length: data.sessionLength.toString(),
+           location: data.location || null,
+           delivery_method: data.deliveryMethod,
+           motivations: Array.isArray(data.motivations) ? data.motivations.join(', ') : data.motivations,
+           package_name: selectedPackage.name || null,
+           package_price: cleanPrice,
+           status: 'pending'
+         })
+         .select()
+         .single()
 
       if (error) {
         setErrors({ submit: `Failed to save your information: ${error.message}` })
