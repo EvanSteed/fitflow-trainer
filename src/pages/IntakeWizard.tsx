@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check, EnvelopeSimple, Monitor, CalendarBlank, User, WarningCircle } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+import { v4 as uuidv4 } from 'uuid'
 import GameHudHeader from '../components/GameHudHeader'
 import GameHudFooter from '../components/GameHudFooter'
 
@@ -185,21 +186,24 @@ export default function IntakeWizard() {
     }
   }
 
-  const handleSubmit = async () => {
-    if (!validateStep()) return
-    setIsSubmitting(true)
-    setErrors({})
+   const handleSubmit = async () => {
+     if (!validateStep()) return
+     setIsSubmitting(true)
+     setErrors({})
 
-    const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
+     const selectedPackage = JSON.parse(localStorage.getItem('selectedPackage') || '{}')
 
-    const cleanPrice = selectedPackage.price
-      ? Math.round(parseFloat(selectedPackage.price.toString().replace(/[^0-9.-]/g, '')))
-      : null
+     const cleanPrice = selectedPackage.price
+       ? Math.round(parseFloat(selectedPackage.price.toString().replace(/[^0-9.-]/g, '')))
+       : null
 
-    try {
-       const { data: client, error } = await supabase
+     const clientId = uuidv4()
+
+     try {
+       const { error } = await supabase
          .from('clients')
          .insert({
+           id: clientId,
            full_name: data.fullName,
            email: data.email,
            phone: data.phone,
@@ -221,27 +225,25 @@ export default function IntakeWizard() {
            package_price: cleanPrice,
            status: 'pending'
          })
-         .select()
-         .single()
 
-      if (error) {
-        setErrors({ submit: `Failed to save your information: ${error.message}` })
-        setIsSubmitting(false)
-        return
-      }
+       if (error) {
+         setErrors({ submit: `Failed to save your information: ${error.message}` })
+         setIsSubmitting(false)
+         return
+       }
 
-      localStorage.setItem('clientData', JSON.stringify({
-        ...data,
-        package_name: selectedPackage.name || null,
-        package_price: cleanPrice
-      }))
-      localStorage.setItem('clientId', client?.id || '')
-      navigate('/payment')
-    } catch (err) {
-      setErrors({ submit: 'Something went wrong. Please try again.' })
-      setIsSubmitting(false)
-    }
-  }
+       localStorage.setItem('clientData', JSON.stringify({
+         ...data,
+         package_name: selectedPackage.name || null,
+         package_price: cleanPrice
+       }))
+       localStorage.setItem('clientId', clientId)
+       navigate('/payment')
+     } catch (err) {
+       setErrors({ submit: 'Something went wrong. Please try again.' })
+       setIsSubmitting(false)
+     }
+   }
 
   const canProceed = () => {
     switch (currentStep) {
