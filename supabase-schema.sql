@@ -1,46 +1,25 @@
--- Run this in Supabase SQL Editor to create the clients table
+-- Run this in Supabase SQL Editor to update the clients table
+-- First, add any missing columns (skip if already added)
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS fitness_check TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS weight_range TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS prefer_low_impact BOOLEAN;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS session_length TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS motivations TEXT;
 
-CREATE TABLE IF NOT EXISTS clients (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  full_name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  age INTEGER,
-  gender TEXT,
-  goals TEXT[],
-  experience_level INTEGER,
-  fitness_check TEXT,
-  weight_range TEXT,
-  prefer_low_impact BOOLEAN,
-  injuries TEXT,
-  equipment_access TEXT[],
-  days_per_week INTEGER,
-  session_length TEXT,
-  location TEXT,
-  delivery_method TEXT,
-  motivations TEXT,
-  package_name TEXT,
-  package_price INTEGER,
-  status TEXT DEFAULT 'pending',
-  stripe_payment_id TEXT,
-  payment_status TEXT DEFAULT 'pending'
-);
+-- Fix column types if they were created with wrong types
+ALTER TABLE clients ALTER COLUMN fitness_check TYPE TEXT USING fitness_check::text;
+ALTER TABLE clients ALTER COLUMN motivations TYPE TEXT USING motivations::text;
+ALTER TABLE clients ALTER COLUMN session_length TYPE TEXT USING session_length::text;
 
--- Enable RLS
+-- Ensure RLS policies are correct
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 
--- Allow public insert (for the intake form)
+DROP POLICY IF EXISTS "allow public client insets permissive public insert null true" ON clients;
+DROP POLICY IF EXISTS "Allow public insert" ON clients;
+
 CREATE POLICY "Allow public insert" ON clients
   FOR INSERT TO anon
   WITH CHECK (true);
 
--- Allow authenticated users to read all
-CREATE POLICY "Allow authenticated read" ON clients
-  FOR SELECT TO authenticated
-  USING (true);
-
--- Allow authenticated users to update
-CREATE POLICY "Allow authenticated update" ON clients
-  FOR UPDATE TO authenticated
-  USING (true);
+-- Verify
+SELECT * FROM pg_policies WHERE tablename = 'clients';
