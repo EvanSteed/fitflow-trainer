@@ -31,6 +31,11 @@ CREATE POLICY "Allow authenticated insert" ON clients
   FOR INSERT TO authenticated
   WITH CHECK (true);
 
+-- Allow anon to select rows they insert (needed for INSERT...RETURNING)
+CREATE POLICY "Allow anon select" ON clients
+  FOR SELECT TO anon
+  USING (true);
+
 -- Allow authenticated users to read all
 CREATE POLICY "Allow authenticated read" ON clients
   FOR SELECT TO authenticated
