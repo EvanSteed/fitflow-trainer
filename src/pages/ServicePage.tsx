@@ -72,7 +72,7 @@ const servicesData: Record<string, {
   'train-with-me': {
     title: 'Train With Me',
     subtitle: 'In-Person Training',
-    description: 'Train directly with our experienced personal trainer in person. Get real-time feedback, motivation, and customized workouts tailored to your specific needs and goals.',
+    description: 'Train directly with our experienced personal trainer in person. Get real-time feedback, motivation, and customised workouts tailored to your specific needs and goals.',
     icon: <Fire className="w-8 h-8 text-gold" weight="bold" />,
     packages: [
       {

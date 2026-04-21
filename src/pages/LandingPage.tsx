@@ -356,7 +356,7 @@ export default function LandingPage() {
               How Stat Stacking Works
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto text-base leading-relaxed">
-              Think of your fitness like an RPG character. Every area of your life is a stat, and the more consistently you train each one, the higher your level goes.
+              Think of your fitness like an RPG character. Every area of your life is a stat, and the more consistently you train each one, the higher your level goes. With the help of a dedicated personal trainer, you can unlock your full potential and maximize every stat.
             </p>
           </div>
 

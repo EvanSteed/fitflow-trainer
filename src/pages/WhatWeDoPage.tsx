@@ -90,11 +90,11 @@ export default function WhatWeDoPage() {
       subtitle: 'Build Your Training Foundation',
       description: 'Every great character starts with a solid build. Your training program is the backbone of your fitness journey — designed around your goals, your schedule, and your experience level.',
       details: [
-        'Personalized workout programs updated weekly or bi-weekly',
-        'Progressive overload built into every session so you keep leveling up',
-        'Programs for strength, hypertrophy, endurance, or general fitness',
+        'Personalised workout programs updated regularly. Alternative exercises can be requested at any time.',
+        'Your program is designed to keep you improving with the right mix of harder sessions, skill work, and recovery to help you progress week after week.',
+        'Programs for strength, hypertrophy, endurance, sport specific, or general fitness',
         'Exercise substitutions for home gym or limited equipment',
-        'Programs delivered directly through Discord for easy access',
+        'Programs delivered through Discord. This is also where you can communicate directly with a trainer in real time and access other resources. Programs can be delivered via email (PDF).',
       ],
       xp: '+STR',
     },
@@ -107,9 +107,9 @@ export default function WhatWeDoPage() {
       details: [
         'Macro targets and calorie guidance tailored to your goal',
         'Meal templates and prep strategies that fit your lifestyle',
-        'Flexible dieting approach — no foods are off limits',
+        'Help you implement simple eating habits that will improve your quality of life.',
         'Nutrition adjustments based on your check-in progress',
-        'Supplement recommendations if needed (no BS, just what works)',
+        'Supplement recommendations if needed',
       ],
       xp: '+NUTR',
     },
@@ -150,7 +150,7 @@ export default function WhatWeDoPage() {
       subtitle: 'Stack Daily XP',
       description: 'The boring stuff that separates Level 1 from Level 50. Sleep, recovery, daily routines — progress compounds week by week. We help you build the habits that turn effort into results.',
       details: [
-        'Sleep optimization strategies for better recovery',
+        'Sleep optimisation strategies for better recovery',
         'Daily routine building and consistency tracking',
         'Stress management techniques to protect your gains',
         'Weekly habit targets that build on each other',
@@ -374,7 +374,7 @@ export default function WhatWeDoPage() {
               { step: '01', title: 'Choose Your Plan', desc: 'Pick the tier that matches your goals and budget. Every plan starts with a free consultation to assess your current level and set your objectives.' },
               { step: '02', title: 'Complete Your Intake', desc: 'Fill out a detailed questionnaire about your training history, goals, injuries, schedule, and nutrition. This is how we build your starting stats.' },
               { step: '03', title: 'Get Your Custom Program', desc: 'Within 48 hours, you receive your personalized training program and nutrition guidelines through Discord. Every detail is built around you.' },
-              { step: '04', title: 'Train & Track', desc: 'Follow your program, send form check videos, and communicate with your coach — all through Discord. Everything stays in one place so the system stays optimized.' },
+              { step: '04', title: 'Train & Track', desc: 'Follow your program, send form check videos, and communicate with your coach — all through Discord. Everything stays in one place so the system stays optimised.' },
               { step: '05', title: 'Check In & Level Up', desc: 'At your scheduled check-in, we review your progress, adjust your program, and set new targets. Rinse and repeat. Week by week, stat by stat.' },
             ].map((item, i) => (
               <div key={i} className="timeline-item hud-card flex items-start gap-5 p-6 relative" style={{ opacity: 0 }}>
