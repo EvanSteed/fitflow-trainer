@@ -24,6 +24,7 @@ interface ClientData {
   location: string
   deliveryMethod: string
   motivations: string[]
+  additionalReason?: string
 }
 
 interface FormErrors {
@@ -86,8 +87,7 @@ const equipment = [
 
 const deliveryMethods = [
   { id: 'email', label: 'Email (PDF)', icon: EnvelopeSimple, desc: 'Receive your program as a PDF attachment' },
-  { id: 'discord', label: 'Discord', icon: Monitor, desc: 'Programs and communication delivered through our Discord server' },
-  { id: 'sheets', label: 'Google Sheets', icon: CalendarBlank, desc: 'Interactive spreadsheet with videos' }
+  { id: 'discord', label: 'Discord', icon: Monitor, desc: 'Programs and communication delivered through our Discord server' }
 ]
 
 const sessionLengths = [
@@ -119,23 +119,25 @@ export default function IntakeWizard() {
     sessionLength: 60,
     location: '',
     deliveryMethod: 'email',
-    motivations: []
+    motivations: [],
+    additionalReason: ''
   })
 
   useEffect(() => {
     const saved = localStorage.getItem('intakeData')
     if (saved) {
       const parsed = JSON.parse(saved)
-      // Merge saved data with new fields for backwards compatibility
-      setData(prev => ({
-        ...prev,
-        ...parsed,
-        fitnessCheck: parsed.fitnessCheck || [],
-        weightRange: parsed.weightRange || '',
-        preferLowImpact: parsed.preferLowImpact || false,
-        sessionLength: parsed.sessionLength || 60,
-        motivations: parsed.motivations || []
-      }))
+        // Merge saved data with new fields for backwards compatibility
+        setData(prev => ({
+          ...prev,
+          ...parsed,
+          fitnessCheck: parsed.fitnessCheck || [],
+          weightRange: parsed.weightRange || '',
+          preferLowImpact: parsed.preferLowImpact || false,
+          sessionLength: parsed.sessionLength || 60,
+          motivations: parsed.motivations || [],
+          additionalReason: parsed.additionalReason || ''
+        }))
     }
   }, [])
 
@@ -200,31 +202,31 @@ export default function IntakeWizard() {
      const clientId = uuidv4()
 
      try {
-       const { error } = await supabase
-         .from('clients')
-         .insert({
-           id: clientId,
-           full_name: data.fullName,
-           email: data.email,
-           phone: data.phone,
-           age: data.age ? parseInt(data.age) || null : null,
-           gender: data.gender || null,
-           goals: data.goals,
-           experience_level: data.experienceLevel,
-           fitness_check: Array.isArray(data.fitnessCheck) ? data.fitnessCheck.join(', ') : data.fitnessCheck,
-           weight_range: data.weightRange || null,
-           prefer_low_impact: data.preferLowImpact,
-           injuries: data.injuries || null,
-           equipment_access: data.equipmentAccess,
-           days_per_week: data.daysPerWeek,
-           session_length: data.sessionLength.toString(),
-           location: data.location || null,
-           delivery_method: data.deliveryMethod,
-           motivations: Array.isArray(data.motivations) ? data.motivations.join(', ') : data.motivations,
-           package_name: selectedPackage.name || null,
-           package_price: cleanPrice,
-           status: 'pending'
-         })
+        const { error } = await supabase
+          .from('clients')
+          .insert({
+            id: clientId,
+            full_name: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            age: data.age ? parseInt(data.age) || null : null,
+            gender: data.gender || null,
+            goals: data.goals,
+            experience_level: data.experienceLevel,
+            fitness_check: Array.isArray(data.fitnessCheck) ? data.fitnessCheck.join(', ') : data.fitnessCheck,
+            weight_range: data.weightRange || null,
+            prefer_low_impact: data.preferLowImpact,
+            injuries: data.injuries || null,
+            equipment_access: data.equipmentAccess,
+            days_per_week: data.daysPerWeek,
+            session_length: data.sessionLength.toString(),
+            location: data.location || null,
+            delivery_method: data.deliveryMethod,
+            motivations: Array.isArray(data.motivations) ? data.motivations.join(', ') + (data.additionalReason ? ', ' + data.additionalReason : '') : data.additionalReason || null,
+            package_name: selectedPackage.name || null,
+            package_price: cleanPrice,
+            status: 'pending'
+          })
 
        if (error) {
          setErrors({ submit: `Failed to save your information: ${error.message}` })
@@ -232,11 +234,12 @@ export default function IntakeWizard() {
          return
        }
 
-       localStorage.setItem('clientData', JSON.stringify({
-         ...data,
-         package_name: selectedPackage.name || null,
-         package_price: cleanPrice
-       }))
+        localStorage.setItem('clientData', JSON.stringify({
+          ...data,
+          package_name: selectedPackage.name || null,
+          package_price: cleanPrice,
+          additionalReason: data.additionalReason
+        }))
        localStorage.setItem('clientId', clientId)
        navigate('/payment')
      } catch (err) {
@@ -539,6 +542,19 @@ export default function IntakeWizard() {
                 </div>
               </button>
             ))}
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              If the above reasons are not sufficient, please tell us why you're starting now:
+            </label>
+            <textarea
+              value={data.additionalReason || ''}
+              onChange={(e) => updateData({ additionalReason: e.target.value })}
+              placeholder="Share any additional reasons..."
+              rows={3}
+              className="w-full bg-hud-bg border border-hud-border rounded px-3 py-2 text-white placeholder-gray-500 resize-none"
+            />
           </div>
         </div>
       )

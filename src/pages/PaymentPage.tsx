@@ -167,17 +167,18 @@ export default function PaymentPage() {
               <form onSubmit={handlePayment} className="space-y-4">
                 {/* Payment Method Selection */}
                 <div className="grid grid-cols-3 gap-2 mb-4">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('card')}
-                    className={`py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider ${
-                      paymentMethod === 'card'
-                        ? 'bg-gold text-hud-bg'
-                        : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
-                    }`}
-                  >
-                    Card (Stripe)
-                  </button>
+                   <button
+                     type="button"
+                     onClick={() => setPaymentMethod('card')}
+                     disabled={true}
+                     className={`py-2.5 px-4 rounded font-medium text-sm transition-all font-rajdhani uppercase tracking-wider opacity-50 cursor-not-allowed ${
+                       paymentMethod === 'card'
+                         ? 'bg-gold text-hud-bg'
+                         : 'bg-hud-panel text-gray-400 hover:text-white border border-hud-border'
+                     }`}
+                   >
+                     Card (Stripe) - Coming Soon
+                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('bank-transfer')}
