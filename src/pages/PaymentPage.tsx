@@ -8,7 +8,7 @@ import GameHudFooter from '../components/GameHudFooter'
 export default function PaymentPage() {
   const navigate = useNavigate()
   const [isProcessing, setIsProcessing] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState('card')
+  const [paymentMethod, setPaymentMethod] = useState('bank-transfer')
   const [error, setError] = useState('')
   const [stripe, setStripe] = useState<any>(null)
 

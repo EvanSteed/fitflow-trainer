@@ -45,10 +45,10 @@ export default function SuccessPage() {
 
             <h2 className="text-lg font-bold text-white mb-4 font-rajdhani">Order Confirmation</h2>
             <div className="space-y-3">
-              <div className="flex justify-between py-2 border-b border-hud-border">
-                <span className="text-gray-400">Order Number</span>
-                <span className="font-mono text-teal">FF-{Date.now().toString(36).toUpperCase()}</span>
-              </div>
+                <div className="flex justify-between py-2 border-b border-hud-border">
+                  <span className="text-gray-400">Client ID</span>
+                  <span className="font-mono text-teal">{clientId}</span>
+                </div>
               <div className="flex justify-between py-2 border-b border-hud-border">
                 <span className="text-gray-400">Package</span>
                 <span className="font-medium text-white">{selectedPackage?.name}</span>
@@ -92,8 +92,8 @@ export default function SuccessPage() {
             <h2 className="text-lg font-bold text-white mb-4 font-rajdhani">What's Next?</h2>
             <div className="space-y-4">
               {[
-                { step: '1', title: 'Check your email', desc: `We've sent a confirmation to ${clientData?.email || 'your inbox'}` },
-                { step: '2', title: 'Join our Discord', desc: 'Complete Discord signup and onboarding to get started', button: true },
+                { step: '1', title: 'Check your email', desc: `We've sent a confirmation to ${clientData?.email || 'your inbox'} (FUNCTION TO STILL BE IMPLEMENTED SO NO CONFIRMATION EMAIL YET)` },
+                { step: '2', title: 'Join our Discord', desc: 'Complete Discord signup and onboarding to get started (DISCORD ONBOARDING STILL NEEDS TO BE IMPLEMENTED - MANUAL ONBOARD ON DISCORD FOR NOW)', button: true },
                 { step: '3', title: 'We will get in contact with you', desc: "We'll reach out as soon as possible to discuss your program" },
               ].map((item) => (
                 <div key={item.step} className="flex items-start gap-3">
@@ -127,14 +127,14 @@ export default function SuccessPage() {
               If you have any questions about your program or need to make changes, reach out anytime.
             </p>
             <div className="space-y-1.5 text-sm">
-              <p className="text-gray-300">
-                <span className="text-gray-500 uppercase tracking-wider text-[10px] font-semibold mr-2">Email</span>
-                hello@statstackers.com
-              </p>
-              <p className="text-gray-300">
-                <span className="text-gray-500 uppercase tracking-wider text-[10px] font-semibold mr-2">Phone</span>
-                +1 (555) 123-4567
-              </p>
+    <p className="text-gray-300">
+      <span className="text-gray-500 uppercase tracking-wider text-[10px] font-semibold mr-2">Email</span>
+      evansteed@hotmail.com
+    </p>
+    <p className="text-gray-300">
+      <span className="text-gray-500 uppercase tracking-wider text-[10px] font-semibold mr-2">Phone</span>
+      Message Evan or Leon on Discord
+    </p>
             </div>
           </div>
 
