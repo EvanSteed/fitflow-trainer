@@ -52,7 +52,7 @@ export default function GameHudFooter() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="https://discord.gg/BJr8TUys"
+                  href="https://discord.gg/y42G8fjvZ"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-gray-400 hover:text-[#5865F2] transition-colors"

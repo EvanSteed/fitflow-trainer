@@ -341,7 +341,7 @@ export default function WhatWeDoPage() {
                   <CaretRight className="w-5 h-5" weight="bold" />
                 </button>
                 <a
-                  href="https://discord.gg/BJr8TUys"
+                  href="https://discord.gg/y42G8fjvZ"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hud-btn hud-btn-discord font-rajdhani text-base px-10 py-4 inline-flex items-center justify-center gap-2"

@@ -127,7 +127,7 @@ export default function GameHudHeader() {
             style={{ boxShadow: '0 0 8px #00ffcc88', opacity: 0 }}
           />
           <button
-            onClick={() => window.open('https://discord.gg/BJr8TUys', '_blank')}
+            onClick={() => window.open('https://discord.gg/y42G8fjvZ', '_blank')}
             className="hud-btn hud-btn-discord font-rajdhani flex items-center gap-1.5 !ml-2"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -179,7 +179,7 @@ export default function GameHudHeader() {
 
             <div className="pt-2 flex gap-2">
               <button
-                onClick={() => window.open('https://discord.gg/BJr8TUys', '_blank')}
+                onClick={() => window.open('https://discord.gg/y42G8fjvZ', '_blank')}
                 className="flex-1 hud-btn-discord font-rajdhani text-sm py-3 text-center inline-flex items-center justify-center gap-2 rounded"
                 style={{ clipPath: 'none' }}
               >

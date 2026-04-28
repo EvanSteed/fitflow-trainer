@@ -539,7 +539,7 @@ export default function LandingPage() {
 
               <div className="flex flex-col items-center group reveal-card" style={{ opacity: 0 }}>
                 <a
-                  href="https://discord.gg/BJr8TUys"
+                  href="https://discord.gg/y42G8fjvZ"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center w-24 h-24 hud-card group-hover:border-[#5865F2]/40 transition-all"
