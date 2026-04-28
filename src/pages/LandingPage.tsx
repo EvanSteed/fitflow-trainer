@@ -578,7 +578,7 @@ export default function LandingPage() {
             {[
               { icon: <MapPin className="w-6 h-6 text-gold" weight="bold" />, label: 'Location', value: 'Online + Plus Fitness Melville', sub: '380 Canning Hwy, Bicton' },
               { icon: <Clock className="w-6 h-6 text-gold" weight="bold" />, label: 'Hours', value: 'Contactable 6am - 8pm every day', sub: '' },
-              { icon: <EnvelopeSimple className="w-6 h-6 text-gold" weight="bold" />, label: 'Contact', value: 'hello@statstackers.com', sub: 'Join the discord and message a Trainer' },
+              { icon: <EnvelopeSimple className="w-6 h-6 text-gold" weight="bold" />, label: 'Contact', value: 'Discord', sub: 'Join the discord and message a Trainer' },
             ].map((info, i) => (
               <div key={i} className="reveal-card hud-card p-6 text-center relative" style={{ opacity: 0 }}>
                 <div className="corner-decor-tl" />
